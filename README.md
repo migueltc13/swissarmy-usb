@@ -80,18 +80,18 @@ Where a command takes `[mount|device]` you can pass the mountpoint
 `udisksctl` if needed), or nothing at all: a mounted stick labelled
 `SWISSARMY` or `Ventoy` is found automatically.
 
-| Command                                        | What it does                                                                                                                         |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `deps [--qemu]`                                | `apt install` git, curl, jq, gnupg, aria2, exfatprogs, dosfstools, parted, xz-utils, udisks2 (+ qemu-system-x86, ovmf with `--qemu`) |
-| `install <device>`                             | Install Ventoy with GPT + Secure Boot (`Ventoy2Disk.sh -I -g -s`). **Wipes the device.**                                             |
-| `update <device>`                              | Update Ventoy on an existing stick (`Ventoy2Disk.sh -u`). Keeps ISOs and config.                                                     |
-| `themes [mount\|device]`                       | Copy the three GRUB themes to `ventoy/theme/`                                                                                        |
-| `isos [mount\|device] [id…]`                   | Download, verify and place ISOs (all, or just the given ids)                                                                         |
-| `config [mount\|device]`                       | Regenerate `ventoy/ventoy.json` and `Files/isos.md`                                                                                  |
-| `persistence <name> [mount\|device] --size MB` | Create `ventoy/persistence/<name>.dat`                                                                                               |
-| `test <device\|image> [--uefi]`                | Boot the stick in QEMU                                                                                                               |
-| `all <device>`                                 | Everything above, in order                                                                                                           |
-| `ventoy-bump <version>`                        | Vendor a different Ventoy release                                                                                                    |
+| Command                                        | What it does                                                                                                                             |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `deps [--qemu]`                                | `apt install` git, curl, jq, gnupg, aria2, pv, exfatprogs, dosfstools, parted, xz-utils, udisks2 (+ qemu-system-x86, ovmf with `--qemu`) |
+| `install <device>`                             | Install Ventoy with GPT + Secure Boot (`Ventoy2Disk.sh -I -g -s`). **Wipes the device.**                                                 |
+| `update <device>`                              | Update Ventoy on an existing stick (`Ventoy2Disk.sh -u`). Keeps ISOs and config.                                                         |
+| `themes [mount\|device]`                       | Copy the three GRUB themes to `ventoy/theme/`                                                                                            |
+| `isos [mount\|device] [id…]`                   | Download, verify and place ISOs (all, or just the given ids)                                                                             |
+| `config [mount\|device]`                       | Regenerate `ventoy/ventoy.json` and `Files/isos.md`                                                                                      |
+| `persistence <name> [mount\|device] --size MB` | Create `ventoy/persistence/<name>.dat`                                                                                                   |
+| `test <device\|image> [--uefi]`                | Boot the stick in QEMU                                                                                                                   |
+| `all <device>`                                 | Everything above, in order                                                                                                               |
+| `ventoy-bump <version>`                        | Vendor a different Ventoy release                                                                                                        |
 
 Examples:
 

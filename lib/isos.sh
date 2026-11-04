@@ -117,7 +117,7 @@ iso_fetch() {
 
     if [[ $verify != none ]]; then
         log "[$id] verifying SHA256"
-        actual=$(sha256sum "$part" 2>/dev/null | cut -d' ' -f1)
+        actual=$(sha256_progress "$part" "$(m "$id" file)")
         if [[ $actual != "$R_SHA256" ]]; then
             warn "[$id] SHA256 mismatch (got ${actual:-nothing}, want $R_SHA256) — deleted"
             rm -f "$part"
@@ -142,7 +142,7 @@ iso_fetch() {
 
     mv -f "$part" "$dest"
     write_state "$state" "VERSION=$R_VERSION" "NAME=$R_NAME" "URL=$R_URL" \
-        "SHA256=${R_SHA256:-$(sha256sum "$dest" | cut -d' ' -f1)}" \
+        "SHA256=${R_SHA256:-$(sha256_progress "$dest")}" \
         "DATE=$(date -u +%Y-%m-%d)" "SIZE=$(stat -c %s "$dest")"
     ok "[$id] installed ${dest#"$mnt"} ($R_VERSION)"
     echo ok
@@ -160,7 +160,7 @@ iso_manual() {
         if [[ ! -f $state ]]; then
             log "[$id] found $(m "$id" file), recording its checksum"
             write_state "$state" "VERSION=manual" "NAME=$(m "$id" file)" "URL=$(m "$id" url)" \
-                "SHA256=$(is_dry_run || sha256sum "$dest" | cut -d' ' -f1)" \
+                "SHA256=$(is_dry_run || sha256_progress "$dest")" \
                 "DATE=$(date -u -r "$dest" +%Y-%m-%d)" "SIZE=$(stat -c %s "$dest")"
         fi
         ok "[$id] $(m "$id" file) is present (manual)"
@@ -188,10 +188,10 @@ iso_manual() {
         echo ok; return
     fi
     mkdir -p "$(dirname "$dest")" "$(state_dir "$mnt")/partial"
-    cp "$src" "$(state_dir "$mnt")/partial/$id.part" || { echo fail; return; }
+    copy_progress "$src" "$(state_dir "$mnt")/partial/$id.part" || { echo fail; return; }
     mv -f "$(state_dir "$mnt")/partial/$id.part" "$dest"
     write_state "$state" "VERSION=$(basename "$src" .iso)" "NAME=$(basename "$src")" \
-        "URL=$(m "$id" url)" "SHA256=$(sha256sum "$dest" | cut -d' ' -f1)" \
+        "URL=$(m "$id" url)" "SHA256=$(sha256_progress "$dest")" \
         "DATE=$(date -u +%Y-%m-%d)" "SIZE=$(stat -c %s "$dest")"
     ok "[$id] installed ${dest#"$mnt"}"
     echo ok

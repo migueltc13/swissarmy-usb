@@ -65,7 +65,7 @@ EOF
 # --- commands --------------------------------------------------------------
 
 cmd_deps() {
-    local -a pkgs=(git curl jq gnupg aria2 exfatprogs dosfstools parted xz-utils udisks2 util-linux)
+    local -a pkgs=(git curl jq gnupg aria2 pv exfatprogs dosfstools parted xz-utils udisks2 util-linux)
     ((WITH_QEMU)) && pkgs+=(qemu-system-x86 ovmf)
     command -v apt-get >/dev/null || die "apt-get not found — this script targets Ubuntu/Debian"
     log "installing: ${pkgs[*]}"

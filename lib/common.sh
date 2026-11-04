@@ -81,3 +81,23 @@ trim() {
     s=${s%"${s##*[![:space:]]}"}
     printf '%s' "$s"
 }
+
+# copy_progress SRC DEST: copy a (large) file, with a progress bar when pv is
+# installed.
+copy_progress() {
+    if command -v pv >/dev/null 2>&1; then
+        pv -N "copy $(basename "$1")" "$1" >"$2"
+    else
+        cp "$1" "$2"
+    fi
+}
+
+# sha256_progress FILE [LABEL]: print FILE's SHA256, with a progress bar when
+# pv is installed (hashing a 6 GB ISO on a USB stick takes minutes).
+sha256_progress() {
+    if command -v pv >/dev/null 2>&1; then
+        pv -N "sha256 ${2:-$(basename "$1")}" "$1" | sha256sum | cut -d' ' -f1
+    else
+        sha256sum "$1" | cut -d' ' -f1
+    fi
+}

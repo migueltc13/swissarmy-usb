@@ -1,0 +1,9 @@
+[submodule "themes/catppuccin-grub"]
+	path = themes/catppuccin-grub
+	url = https://github.com/catppuccin/grub
+[submodule "themes/tokyo-night-grub"]
+	path = themes/tokyo-night-grub
+	url = https://github.com/mino29/tokyo-night-grub
+[submodule "themes/grub2-themes"]
+	path = themes/grub2-themes
+	url = https://github.com/vinceliuice/grub2-themes

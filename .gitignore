@@ -1,0 +1,12 @@
+# Never commit disk images or ISOs
+*.iso
+*.img
+*.dat
+# ...except the boot images inside the vendored Ventoy release
+!/ventoy/ventoy-*/**/*.img
+
+# Written by Ventoy2Disk.sh if it is ever run in place
+/ventoy/ventoy-*/log.txt
+
+*.part
+*.bak

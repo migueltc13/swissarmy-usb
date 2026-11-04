@@ -1,0 +1,83 @@
+# shellcheck shell=bash
+# Shared helpers: logging, dry-run aware command execution, small utilities.
+
+DRY_RUN=${DRY_RUN:-0}
+
+if [[ -t 2 ]]; then
+    C_BLUE=$'\033[1;34m' C_YELLOW=$'\033[1;33m' C_RED=$'\033[1;31m'
+    C_GREEN=$'\033[1;32m' C_RESET=$'\033[0m'
+else
+    C_BLUE='' C_YELLOW='' C_RED='' C_GREEN='' C_RESET=''
+fi
+
+log()  { printf '%s==>%s %s\n' "$C_BLUE" "$C_RESET" "$*" >&2; }
+ok()   { printf '%s ok%s %s\n' "$C_GREEN" "$C_RESET" "$*" >&2; }
+warn() { printf '%swarning:%s %s\n' "$C_YELLOW" "$C_RESET" "$*" >&2; }
+die()  { printf '%serror:%s %s\n' "$C_RED" "$C_RESET" "$*" >&2; exit 1; }
+
+is_dry_run() { [[ $DRY_RUN == 1 ]]; }
+
+# run CMD...: execute a command, or only print it in dry-run mode.
+run() {
+    if is_dry_run; then
+        printf '[dry-run]' >&2
+        printf ' %q' "$@" >&2
+        printf '\n' >&2
+    else
+        "$@"
+    fi
+}
+
+# as_root CMD...: like run, but through sudo when not already root.
+as_root() {
+    if [[ $EUID -eq 0 ]]; then
+        run "$@"
+    else
+        run sudo "$@"
+    fi
+}
+
+need_cmd() {
+    local cmd
+    for cmd in "$@"; do
+        command -v "$cmd" >/dev/null 2>&1 \
+            || die "missing command '$cmd' (run: ./setup.sh deps)"
+    done
+}
+
+# fetch URL: print a (small) remote file to stdout. Read-only, so it also runs
+# in dry-run mode — resolving versions never changes anything.
+fetch() {
+    curl -fsSL --retry 3 --connect-timeout 20 "$1"
+}
+
+# Ask a yes/no question on the terminal. Returns 0 on "y".
+confirm() {
+    local answer
+    [[ -r /dev/tty ]] || die "no terminal available to confirm: $1"
+    read -r -p "$1 [y/N] " answer </dev/tty
+    [[ $answer == [yY] || $answer == [yY][eE][sS] ]]
+}
+
+# One scratch directory per run, removed on exit. Created up front (not lazily)
+# so that make_tmp also works inside $(...) subshells.
+TMP_ROOT=$(mktemp -d -t swissarmy.XXXXXX)
+# shellcheck disable=SC2064  # expand now: the path is fixed
+trap "rm -rf '$TMP_ROOT' 2>/dev/null" EXIT
+
+make_tmp() { mktemp -d -p "$TMP_ROOT"; }
+
+# Read KEY from a simple KEY=VALUE file.
+kv_get() {
+    local file=$1 key=$2
+    [[ -f $file ]] || return 0
+    sed -n "s/^${key}=//p" "$file" | tail -n 1
+}
+
+# trim STRING: strip leading and trailing whitespace.
+trim() {
+    local s=$1
+    s=${s#"${s%%[![:space:]]*}"}
+    s=${s%"${s##*[![:space:]]}"}
+    printf '%s' "$s"
+}

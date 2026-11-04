@@ -133,6 +133,11 @@ iso_fetch() {
         actual=$(<"$part.sha256") # hashed while downloading
     fi
     rm -f "$part.sha256"
+    if [[ $got_dl == 0 ]]; then
+        # Keep the partial download: the next run resumes it.
+        warn "[$id] download failed or interrupted — rerun to resume"
+        echo fail; return
+    fi
 
     if [[ $verify != none ]]; then
         if [[ -z $actual ]]; then
@@ -145,9 +150,6 @@ iso_fetch() {
             echo fail; return
         fi
         ok "[$id] SHA256 ok"
-    elif [[ $got_dl == 0 ]]; then
-        warn "[$id] download failed"
-        echo fail; return
     else
         warn "[$id] upstream publishes no checksum — not verified"
     fi

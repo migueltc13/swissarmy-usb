@@ -5,7 +5,8 @@ THEMES_DIR="$REPO_DIR/themes"
 
 # name -> source directory inside the submodules. Vimix is generated below.
 declare -A THEME_SRC=(
-    [catppuccin-mocha]="$THEMES_DIR/catppuccin-grub/src/catppuccin-mocha-grub-theme"
+    # Catppuccin ships a Ventoy-specific variant next to its GRUB theme.
+    [catppuccin-mocha]="$THEMES_DIR/catppuccin-grub/ventoy/src/mocha/catppuccin-mocha"
     [tokyo-night]="$THEMES_DIR/tokyo-night-grub/tokyo-night"
 )
 THEME_ORDER=(catppuccin-mocha tokyo-night vimix)

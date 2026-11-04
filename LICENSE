@@ -25,6 +25,6 @@ This license covers the scripts and configuration in this repository only.
 Third-party components keep their own licenses:
 
   ventoy/ventoy-*/       Ventoy — GPLv3 (see ventoy/ventoy-*/COPYING)
-  themes/catppuccin-grub Catppuccin GRUB theme — MIT
+  themes/catppuccin-grub Catppuccin GRUB/Ventoy theme — MIT
   themes/tokyo-night-grub Tokyo Night GRUB theme — MIT
   themes/grub2-themes    Vimix and others by vinceliuice — GPLv3

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo/swissarmy-usb.png" alt="swissarmy-usb: one stick, every tool" width="640">
+  <img src=".github/assets/logo/swissarmy-usb.png" alt="swissarmy-usb: one stick, every tool" width="640">
 </p>
 
 <p align="center">
@@ -8,7 +8,7 @@
   offline antivirus,<br>all on one stick with a themed boot menu.
 </p>
 
-![The stick booting with the Catppuccin Mocha theme](docs/screenshots/catppuccin-mocha.png)
+![The stick booting with the Catppuccin Mocha theme](.github/assets/screenshots/catppuccin-mocha.png)
 
 Everything lives in this repository (pinned Ventoy release, themes, ISO
 manifest, scripts) except the ISOs themselves, which `setup.sh` downloads and
@@ -220,10 +220,10 @@ Three GRUB2 themes are included as submodules and copied to
 `<stick>/ventoy/theme/<name>/`. Each must contain a `theme.txt`, and
 `setup.sh` checks this.
 
-| Catppuccin Mocha                                           | Tokyo Night                                                           | Vimix                                                                   |
-| ---------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| ![Catppuccin Mocha](docs/screenshots/catppuccin-mocha.png) | ![Tokyo Night](docs/screenshots/tokyo-night.png)                      | ![Vimix](docs/screenshots/vimix.png)                                    |
-| [catppuccin/grub](https://github.com/catppuccin/grub)      | [mino29/tokyo-night-grub](https://github.com/mino29/tokyo-night-grub) | [vinceliuice/grub2-themes](https://github.com/vinceliuice/grub2-themes) |
+| Catppuccin Mocha                                                     | Tokyo Night                                                           | Vimix                                                                   |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ![Catppuccin Mocha](.github/assets/screenshots/catppuccin-mocha.png) | ![Tokyo Night](.github/assets/screenshots/tokyo-night.png)            | ![Vimix](.github/assets/screenshots/vimix.png)                          |
+| [catppuccin/grub](https://github.com/catppuccin/grub)                | [mino29/tokyo-night-grub](https://github.com/mino29/tokyo-night-grub) | [vinceliuice/grub2-themes](https://github.com/vinceliuice/grub2-themes) |
 
 Vimix is generated, not copied:
 `install.sh -t vimix -i color -s 1080p -g <outdir>`.
@@ -239,7 +239,7 @@ for firmware that doesn't offer it.
 **Our tweaks.** `assets/themes/<name>/` is copied over a theme on the stick:
 Catppuccin and Tokyo Night get the swissarmy-usb logo and a `theme.txt` laid
 out so all five sections fit at 720p. The logo sources are the SVGs in
-[`docs/logo/`](docs/logo).
+[`.github/assets/logo/`](.github/assets/logo).
 
 Other theme settings (`gfxmode`, `display_mode`) and Ventoy options (`control`,
 `menu_tip` position and colour) live in the same template. Values in the

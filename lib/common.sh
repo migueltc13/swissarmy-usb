@@ -82,14 +82,16 @@ trim() {
     printf '%s' "$s"
 }
 
-# copy_progress SRC DEST: copy a (large) file, with a progress bar when pv is
-# installed.
-copy_progress() {
+# copy_hash SRC DEST: copy a (large) file and print its SHA256, reading SRC
+# once and never reading DEST back. Shows a progress bar when pv is installed.
+copy_hash() {
+    local hash
     if command -v pv >/dev/null 2>&1; then
-        pv -N "copy $(basename "$1")" "$1" >"$2"
+        hash=$(pv -N "copy $(basename "$1")" "$1" | tee "$2" | sha256sum) || return 1
     else
-        cp "$1" "$2"
+        hash=$(tee "$2" <"$1" | sha256sum) || return 1
     fi
+    echo "${hash%% *}"
 }
 
 # sha256_progress FILE [LABEL]: print FILE's SHA256, with a progress bar when

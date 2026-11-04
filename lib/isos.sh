@@ -38,8 +38,11 @@ write_state() {
 }
 
 # download URL OUT: resumable download (curl -C -, or aria2c for torrents).
+# A fresh curl download is hashed on the fly and the SHA256 left in
+# OUT.sha256, so the ISO never has to be read back from the (slow) stick.
 download() {
-    local url=$1 out=$2 dir torrent
+    local url=$1 out=$2 dir torrent hash
+    rm -f "$out.sha256"
     if [[ $url == *.torrent ]]; then
         need_cmd aria2c
         dir="$out.d"
@@ -51,15 +54,20 @@ download() {
             --summary-interval=0 --console-log-level=warn "$torrent" >&2 || return 1
         # Single-file torrent: move the payload to OUT.
         mv "$(find "$dir" -type f -name '*.iso' | head -n 1)" "$out" && rm -rf "$dir"
-    else
+    elif [[ -s $out ]]; then
+        # Resuming: the SHA256 is computed from the whole file afterwards.
         curl -fL --progress-bar --retry 3 --connect-timeout 20 -C - -o "$out" "$url"
+    else
+        hash=$(curl -fL --progress-bar --retry 3 --connect-timeout 20 "$url" \
+            | tee "$out" | sha256sum) || return 1
+        echo "${hash%% *}" >"$out.sha256"
     fi
 }
 
 # iso_fetch MNT ID: resolve, download if needed, verify, install.
 # Echoes one of: ok skip fail.
 iso_fetch() {
-    local mnt=$1 id=$2 verify dest state part tmp actual got_dl=1
+    local mnt=$1 id=$2 verify dest state part tmp actual='' got_dl=1
     verify=$(m "$id" verify)
     dest="$mnt$(iso_path "$id")"
     state="$(state_dir "$mnt")/$id.env"
@@ -111,13 +119,20 @@ iso_fetch() {
     mkdir -p "$(dirname "$dest")" "$(state_dir "$mnt")/partial"
     part="$(state_dir "$mnt")/partial/$id-$R_VERSION.part"
     # Partial downloads of other versions can't be resumed; drop them.
-    find "$(state_dir "$mnt")/partial" -maxdepth 1 -name "$id-*.part" ! -path "$part" -exec rm -rf {} +
+    find "$(state_dir "$mnt")/partial" -maxdepth 1 -name "$id-*" \
+        ! -name "$(basename "$part")*" -exec rm -rf {} +
     log "[$id] downloading $R_URL"
     download "$R_URL" "$part" || got_dl=0
+    if [[ $got_dl == 1 && -f $part.sha256 ]]; then
+        actual=$(<"$part.sha256") # hashed while downloading
+    fi
+    rm -f "$part.sha256"
 
     if [[ $verify != none ]]; then
-        log "[$id] verifying SHA256"
-        actual=$(sha256_progress "$part" "$(m "$id" file)")
+        if [[ -z $actual ]]; then
+            log "[$id] verifying SHA256"
+            actual=$(sha256_progress "$part" "$(m "$id" file)")
+        fi
         if [[ $actual != "$R_SHA256" ]]; then
             warn "[$id] SHA256 mismatch (got ${actual:-nothing}, want $R_SHA256) — deleted"
             rm -f "$part"
@@ -142,7 +157,7 @@ iso_fetch() {
 
     mv -f "$part" "$dest"
     write_state "$state" "VERSION=$R_VERSION" "NAME=$R_NAME" "URL=$R_URL" \
-        "SHA256=${R_SHA256:-$(sha256_progress "$dest")}" \
+        "SHA256=${R_SHA256:-${actual:-$(sha256_progress "$dest")}}" \
         "DATE=$(date -u +%Y-%m-%d)" "SIZE=$(stat -c %s "$dest")"
     ok "[$id] installed ${dest#"$mnt"} ($R_VERSION)"
     echo ok
@@ -152,7 +167,7 @@ iso_fetch() {
 # them from --from <dir> when given, otherwise explains where to get them.
 # Echoes one of: ok skip missing fail.
 iso_manual() {
-    local mnt=$1 id=$2 dest state src='' cand
+    local mnt=$1 id=$2 dest state src='' cand sha part
     dest="$mnt$(iso_path "$id")"
     state="$(state_dir "$mnt")/$id.env"
 
@@ -188,10 +203,11 @@ iso_manual() {
         echo ok; return
     fi
     mkdir -p "$(dirname "$dest")" "$(state_dir "$mnt")/partial"
-    copy_progress "$src" "$(state_dir "$mnt")/partial/$id.part" || { echo fail; return; }
-    mv -f "$(state_dir "$mnt")/partial/$id.part" "$dest"
+    part="$(state_dir "$mnt")/partial/$id.part"
+    sha=$(copy_hash "$src" "$part") || { rm -f "$part"; echo fail; return; }
+    mv -f "$part" "$dest"
     write_state "$state" "VERSION=$(basename "$src" .iso)" "NAME=$(basename "$src")" \
-        "URL=$(m "$id" url)" "SHA256=$(sha256_progress "$dest")" \
+        "URL=$(m "$id" url)" "SHA256=$sha" \
         "DATE=$(date -u +%Y-%m-%d)" "SIZE=$(stat -c %s "$dest")"
     ok "[$id] installed ${dest#"$mnt"}"
     echo ok

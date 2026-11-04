@@ -113,6 +113,16 @@ expand_ids() {
     done
 }
 
+# test_hint MNT: how to boot the stick mounted at MNT in QEMU.
+test_hint() {
+    local part disk
+    part=$(findmnt -no SOURCE "$1" 2>/dev/null || true)
+    disk=$(lsblk -no PKNAME "$part" 2>/dev/null || true)
+    [[ -n $disk ]] || disk="<device>"
+    [[ $disk == /dev/* || $disk == "<device>" ]] || disk=/dev/$disk
+    ok "test it: ./setup.sh test $disk   (UEFI: ./setup.sh test $disk --uefi)"
+}
+
 cmd_isos() {
     local mnt='' status=0 list
     local -a ids=()
@@ -127,7 +137,10 @@ cmd_isos() {
     [[ -n $list ]] && mapfile -t ids <<<"$list"
     mnt=$(resolve_mount "$mnt")
     isos_sync "$mnt" "${ids[@]}" || status=$?
-    ((AUTO_CONFIG)) && cmd_config "$mnt"
+    if ((AUTO_CONFIG)); then # not when called from "all", which says it itself
+        cmd_config "$mnt"
+        is_dry_run || test_hint "$mnt"
+    fi
     return "$status"
 }
 
@@ -196,7 +209,7 @@ cmd_all() {
     if ((status)); then
         warn "some ISOs failed — rerun ./setup.sh isos $dev to retry them"
     else
-        ok "done. Try it: ./setup.sh test $dev"
+        ok "done. Test it: ./setup.sh test $dev   (UEFI: ./setup.sh test $dev --uefi)"
     fi
     return "$status"
 }

@@ -53,21 +53,36 @@ Then boot it in a VM to check: `./setup.sh test /dev/sdb`.
 ## What ends up on the stick
 
 ```
-SWISSARMY/                  exFAT data partition
-├── 1-Installers/   archlinux, omarchy, ubuntu-24.04-desktop, kali-netinst,
-│                   windows10, windows11
-├── 2-Disk-Tools/   clonezilla, gparted
-├── 3-Rescue/       boot-repair-disk, redorescue, systemrescue
-├── 4-Security/     kali-live, tails, caine
-├── 5-Antivirus/    antivirus-livecd (4MLinux), krd (Kaspersky Rescue Disk)
-├── Files/          free space for your files — Ventoy does not scan it
+SWISSARMY/                        exFAT data partition
+├── 1-Installers/
+│   ├── archlinux.iso
+│   ├── omarchy.iso
+│   ├── ubuntu-24.04-desktop.iso
+│   ├── kali-netinst.iso
+│   ├── windows10.iso             manual download
+│   └── windows11.iso             manual download
+├── 2-Disk-Tools/
+│   ├── clonezilla.iso
+│   └── gparted.iso
+├── 3-Rescue/
+│   ├── boot-repair-disk.iso
+│   ├── redorescue.iso            manual download
+│   └── systemrescue.iso
+├── 4-Security/
+│   ├── kali-live.iso
+│   ├── tails.iso
+│   └── caine.iso
+├── 5-Antivirus/
+│   ├── antivirus-livecd.iso      4MLinux + ClamAV
+│   └── krd.iso                   Kaspersky Rescue Disk
+├── Files/                        free space for your files (not scanned)
 │   ├── .ventoyignore
-│   ├── isos.md     generated: name, version, language, date, source, SHA256
-│   └── .swissarmy/ download state (used for "already up to date" checks)
+│   ├── isos.md                   generated ISO list: version, date, SHA256…
+│   └── .swissarmy/               download state ("up to date" checks)
 └── ventoy/
-    ├── ventoy.json generated config (themes, menu aliases, tips, persistence)
-    ├── theme/      catppuccin-mocha/, tokyo-night/, vimix/
-    └── persistence/ optional *.dat images
+    ├── ventoy.json               generated config: themes, aliases, tips
+    ├── theme/                    catppuccin-mocha/, tokyo-night/, vimix/
+    └── persistence/              optional *.dat persistence images
 ```
 
 ISO filenames on the stick have no version in them (`kali-live.iso`), so menu

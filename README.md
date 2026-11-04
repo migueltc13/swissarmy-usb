@@ -6,6 +6,8 @@ offline antivirus, all on one stick with a themed boot menu.
 
 ![The stick booting with the Catppuccin Mocha theme](docs/screenshots/catppuccin-mocha.png)
 
+![Inside the Installers folder](docs/screenshots/catppuccin-mocha-installers.png)
+
 Everything lives in this repository (pinned Ventoy release, themes, ISO
 manifest, scripts) except the ISOs themselves, which `setup.sh` downloads and
 verifies.

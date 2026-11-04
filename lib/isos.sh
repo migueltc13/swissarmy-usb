@@ -50,7 +50,10 @@ download() {
         torrent=$(make_tmp)/file.torrent
         fetch "$url" >"$torrent" || return 1
         log "downloading via BitTorrent (upstream only seeds this image)"
+        # No DHT: the torrent's own trackers find the peers, and DHT only adds
+        # a scary but harmless "Failed to load DHT routing table" error.
         aria2c --dir "$dir" --seed-time=0 --continue=true --file-allocation=none \
+            --enable-dht=false --enable-dht6=false \
             --summary-interval=0 --console-log-level=warn "$torrent" >&2 || return 1
         # Single-file torrent: move the payload to OUT.
         mv "$(find "$dir" -type f -name '*.iso' | head -n 1)" "$out" && rm -rf "$dir"

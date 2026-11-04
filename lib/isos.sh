@@ -41,25 +41,47 @@ write_state() {
 # A fresh curl download is hashed on the fly and the SHA256 left in
 # OUT.sha256, so the ISO never has to be read back from the (slow) stick.
 download() {
-    local url=$1 out=$2 dir torrent hash
+    local url=$1 out=$2 dir torrent hash size avail cache iso
     rm -f "$out.sha256"
     if [[ $url == *.torrent ]]; then
         need_cmd aria2c
-        dir="$out.d"
-        mkdir -p "$dir"
         torrent=$(make_tmp)/file.torrent
         fetch "$url" >"$torrent" || return 1
-        log "downloading via BitTorrent (upstream only seeds this image)"
+        size=$(aria2c -S "$torrent" | sed -n 's/^Total Length: .*(\([0-9,]*\)).*/\1/p' | tr -d ,)
+        # Torrents write pieces in random order, which is painfully slow on a
+        # USB stick. Download to the PC when it has room (plus 1 GB to spare),
+        # then copy to the stick in one sequential pass.
+        cache="${XDG_CACHE_HOME:-$HOME/.cache}/swissarmy-usb"
+        mkdir -p "$cache"
+        avail=$(df --output=avail -B1 "$cache" | tail -n 1)
+        if [[ -d $cache/$(basename "$out").d ]] \
+            || { [[ -n $size ]] && ((avail > size + (1 << 30))); }; then
+            dir="$cache/$(basename "$out").d"
+            rm -rf "$out.d"
+        else
+            dir="$out.d"
+            warn "not enough free space in $cache — downloading straight to the stick (slow)"
+        fi
+        mkdir -p "$dir"
+        log "downloading via BitTorrent into $dir (upstream only seeds this image)"
         # No DHT: the torrent's own trackers find the peers, and DHT only adds
         # a scary but harmless "Failed to load DHT routing table" error.
         # Preallocate: exFAT can't hold sparse files, so the first piece written
         # far into the file zero-fills everything before it — a silent stall at
         # 0 B. Preallocating does that work up front, with a FileAlloc progress.
         aria2c --dir "$dir" --seed-time=0 --continue=true --file-allocation=prealloc \
-            --enable-dht=false --enable-dht6=false \
+            --enable-dht=false --enable-dht6=false --disk-cache=64M \
             --summary-interval=0 --console-log-level=warn "$torrent" >&2 || return 1
-        # Single-file torrent: move the payload to OUT.
-        mv "$(find "$dir" -type f -name '*.iso' | head -n 1)" "$out" && rm -rf "$dir"
+        # Single-file torrent: move (or, from the PC, copy) the payload to OUT.
+        iso=$(find "$dir" -type f -name '*.iso' | head -n 1)
+        [[ -n $iso ]] || return 1
+        if [[ $dir == "$out.d" ]]; then
+            mv "$iso" "$out"
+        else
+            hash=$(copy_hash "$iso" "$out") || return 1
+            echo "$hash" >"$out.sha256"
+        fi
+        rm -rf "$dir"
     elif [[ -s $out ]]; then
         # Resuming: the SHA256 is computed from the whole file afterwards.
         curl -fL --progress-bar --retry 3 --connect-timeout 20 -C - -o "$out" "$url"

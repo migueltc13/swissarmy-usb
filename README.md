@@ -2,11 +2,11 @@
   <img src="docs/logo/swissarmy-usb.png" alt="swissarmy-usb: one stick, every tool" width="640">
 </p>
 
-# swissarmy-usb
-
-One script to build a **multiboot USB stick** with [Ventoy](https://www.ventoy.net)
-on Ubuntu Linux: installers, disk tools, rescue systems, security distros and
-offline antivirus, all on one stick with a themed boot menu.
+<p align="center">
+  One script to build a <b>multiboot USB stick</b> with <a href="https://www.ventoy.net">Ventoy</a>
+  on Ubuntu Linux:<br>installers, disk tools, rescue systems, security distros and
+  offline antivirus,<br>all on one stick with a themed boot menu.
+</p>
 
 ![The stick booting with the Catppuccin Mocha theme](docs/screenshots/catppuccin-mocha.png)
 

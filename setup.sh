@@ -172,10 +172,13 @@ cmd_test() {
     elif [[ ! -f $target ]]; then
         die "$target is neither a block device nor an image file"
     fi
-    qemu=(qemu-system-x86_64 -enable-kvm -m 2G -drive "file=$target,format=raw")
-    if [[ ! -w /dev/kvm ]]; then
+    # zoom-to-fit scales the menu down to the window, so it also
+    # works on smaller screens (resize or maximize the window).
+    qemu=(qemu-system-x86_64 -m 2G -drive "file=$target,format=raw" -display "gtk,zoom-to-fit=on")
+    if [[ -w /dev/kvm ]]; then
+        qemu+=(-enable-kvm)
+    else
         warn "/dev/kvm is not available — falling back to (slow) software emulation"
-        qemu=(qemu-system-x86_64 -m 2G -drive "file=$target,format=raw")
     fi
     if ((UEFI)); then
         for ovmf in /usr/share/ovmf/OVMF.fd /usr/share/qemu/OVMF.fd; do

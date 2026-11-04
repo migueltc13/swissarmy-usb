@@ -46,6 +46,11 @@ themes_install() {
         if ! is_dry_run; then
             [[ -f $dest/theme.txt ]] || die "copy failed: $dest/theme.txt missing"
         fi
+        # Catppuccin's menu is 30% of the screen: 4 rows at 1280x720, which
+        # hides the 5th section. 45% still ends above the tip line at 81%.
+        if [[ $name == catppuccin-mocha ]]; then
+            run sed -i '/^+ boot_menu {/,/^}/s/^\( *height = \)30%/\145%/' "$dest/theme.txt"
+        fi
     done
     ok "themes installed: ${THEME_ORDER[*]}"
 }

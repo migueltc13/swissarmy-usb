@@ -211,8 +211,12 @@ Vimix is generated, not copied:
 
 **Picking a theme.** `default_file` in
 [`config/ventoy.json.tmpl`](config/ventoy.json.tmpl) chooses the theme:
-`0` picks one at random on every boot, and `1`, `2`, `3` select Catppuccin,
-Tokyo Night or Vimix. Run `./setup.sh config` after changing it. Other theme
+`1` (the default), `2`, `3` select Catppuccin, Tokyo Night or Vimix, and `0`
+picks one at random on every boot. Run `./setup.sh config` after changing it.
+`gfxmode` is a list tried in order: `1280x720` keeps the menu text large on
+small laptop screens and scales cleanly to 1080p, with `auto` as a fallback
+for firmware that doesn't offer it. Catppuccin's menu is made taller when it
+is copied to the stick, so all five sections fit at 720p. Other theme
 settings (`gfxmode`, `display_mode`) and Ventoy options (`control`,
 `menu_tip` position and colour) live in the same template. Values in the
 generated lists (theme files, aliases, tips, persistence) are merged into the

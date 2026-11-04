@@ -22,11 +22,11 @@ device_check() {
     type=$(lsblk_field TYPE "$dev")
     case $type in
         disk) ;;
-        part) die "$dev is a partition — pass the whole disk (e.g. /dev/$(lsblk_field PKNAME "$dev"))" ;;
+        part) die "$dev is a partition; pass the whole disk (e.g. /dev/$(lsblk_field PKNAME "$dev"))" ;;
         loop)
             [[ $SWISSARMY_ALLOW_LOOP == 1 ]] \
                 || die "$dev is a loop device (set SWISSARMY_ALLOW_LOOP=1 for testing)"
-            warn "$dev is a loop device — accepted because SWISSARMY_ALLOW_LOOP=1"
+            warn "$dev is a loop device, accepted because SWISSARMY_ALLOW_LOOP=1"
             ;;
         *) die "$dev has type '$type', expected a whole disk" ;;
     esac
@@ -35,7 +35,7 @@ device_check() {
         rm=$(lsblk_field RM "$dev")
         tran=$(lsblk_field TRAN "$dev")
         if [[ $rm != 1 && $tran != usb ]]; then
-            die "$dev is not removable (RM=$rm TRAN=${tran:-none}) — refusing"
+            die "$dev is not removable (RM=$rm TRAN=${tran:-none}), refusing"
         fi
     fi
 
@@ -44,12 +44,12 @@ device_check() {
     while read -r name mnt; do
         [[ -n $mnt ]] || continue
         if [[ $mnt =~ $SYSTEM_MOUNTS_RE ]]; then
-            die "$name is mounted at $mnt — $dev holds the running system, refusing"
+            die "$name is mounted at $mnt: $dev holds the running system, refusing"
         fi
         # A USB stick lives under /media, /run/media or /mnt. Anything else
         # (/snap/..., /srv/data, ...) is not something we should touch.
         if [[ ! $mnt =~ ^(/media/|/run/media/|/mnt/) ]]; then
-            die "$name is mounted at $mnt, which is not a removable-media mount — refusing"
+            die "$name is mounted at $mnt, which is not a removable-media mount, refusing"
         fi
     done < <(lsblk -nlpo NAME,MOUNTPOINT "$dev")
 
@@ -58,7 +58,7 @@ device_check() {
     root_src=$(findmnt -no SOURCE / 2>/dev/null || true)
     if [[ -b $root_src ]]; then
         root_disk=$(lsblk -nspo NAME,TYPE "$root_src" | awk '$2=="disk"{print $1; exit}')
-        [[ $root_disk != "$dev" ]] || die "$dev holds the root filesystem — refusing"
+        [[ $root_disk != "$dev" ]] || die "$dev holds the root filesystem, refusing"
     fi
 }
 
@@ -80,7 +80,7 @@ device_confirm() {
     [[ -r /dev/tty ]] || die "no terminal available to confirm the target device"
     read -r -p "Type the device name ($(basename "$dev")) to confirm: " answer </dev/tty
     [[ $answer == "$(basename "$dev")" || $answer == "$dev" ]] \
-        || die "confirmation did not match — nothing was changed"
+        || die "confirmation did not match, nothing was changed"
 }
 
 # device_unmount DEV: unmount every mounted partition of DEV.
@@ -109,7 +109,7 @@ device_mount_data() {
     part=$(device_data_part "$dev")
     if [[ -z $part ]]; then
         is_dry_run && { echo "/media/$USER/SWISSARMY"; return; }
-        die "$dev has no partitions — install Ventoy first"
+        die "$dev has no partitions; install Ventoy first"
     fi
     mnt=$(lsblk -no MOUNTPOINT "$part" | head -n 1)
     if [[ -z $mnt ]]; then
@@ -132,7 +132,7 @@ resolve_mount() {
     local arg=${1:-} mnt
     if [[ -z $arg ]]; then
         mnt=$(lsblk -nlo LABEL,MOUNTPOINT | awk '($1=="SWISSARMY"||$1=="Ventoy") && $2!=""{print $2; exit}')
-        [[ -n $mnt ]] || die "no mounted SWISSARMY/Ventoy stick found — pass a mountpoint or device"
+        [[ -n $mnt ]] || die "no mounted SWISSARMY/Ventoy stick found; pass a mountpoint or device"
         log "using detected stick at $mnt"
         echo "$mnt"
         return
@@ -145,7 +145,7 @@ resolve_mount() {
         return
     fi
     if [[ -d $arg ]]; then
-        mountpoint -q "$arg" || die "$arg is not a mountpoint — refusing to write ISOs into a plain directory"
+        mountpoint -q "$arg" || die "$arg is not a mountpoint, refusing to write ISOs into a plain directory"
         [[ -w $arg ]] || die "$arg is not writable by $USER (mount it with udisksctl or your file manager)"
         (cd "$arg" && pwd)
         return

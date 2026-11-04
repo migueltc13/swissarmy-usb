@@ -15,7 +15,7 @@ manifest, scripts) except the ISOs themselves, which `setup.sh` downloads and
 verifies.
 
 > [!IMPORTANT]
-> **Clone with submodules** — the GRUB themes are git submodules:
+> **Clone with submodules:** the GRUB themes are git submodules:
 >
 > ```sh
 > git clone --recursive https://github.com/migueltc13/swissarmy-usb.git

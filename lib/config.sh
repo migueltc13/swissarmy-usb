@@ -68,9 +68,9 @@ config_validate() {
 
 # md_table: read tab-separated rows (the first one is the header) and print
 # a Markdown table with aligned columns, the way prettier formats it. Every
-# cell must be non-empty (use "—"), since read collapses empty tab fields.
+# cell must be non-empty (use "-"), since read collapses empty tab fields.
 md_table() {
-    local LC_ALL=C.UTF-8 # count characters, not bytes, for "—"
+    local LC_ALL=C.UTF-8 # count characters, not bytes (names may be UTF-8)
     local -a rows=() widths=() cells
     local row i cell out
 
@@ -122,10 +122,10 @@ config_isos_md() {
                 [[ $version == manual ]] && version=''
                 is_manual "$id" && version="${version:+$version }(manual)"
                 printf '%s\t`%s`\t%s\t%s\t%s\t%s\t%s\n' \
-                    "$(m "$id" alias)" "$(m "$id" file)" "${version:-—}" "$(m "$id" lang)" \
-                    "${date:-—}" "${url:-—}" "${sha:+\`$sha\`}"
+                    "$(m "$id" alias)" "$(m "$id" file)" "${version:--}" "$(m "$id" lang)" \
+                    "${date:--}" "${url:--}" "${sha:+\`$sha\`}"
             done
-        } | sed -e 's/\t\t/\t—\t/g' -e 's/\t\t/\t—\t/g' -e 's/\t$/\t—/' | md_table
+        } | sed -e 's/\t\t/\t-\t/g' -e 's/\t\t/\t-\t/g' -e 's/\t$/\t-/' | md_table
     done
 }
 

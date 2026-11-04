@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # Optional persistence images (ventoy/persistence/<name>.dat).
 
-# persistence_entry NAME: the ISO id a persistence image belongs to — an
+# persistence_entry NAME: the ISO id a persistence image belongs to: an
 # exact id, or the single entry with a "persistence" label whose id starts
 # with NAME (so "kali" finds "kali-live").
 persistence_entry() {
@@ -27,7 +27,7 @@ persistence_create() {
         || die "no ISO with persistence support matches '$name' (add 'persistence = <label>' in isos.conf)"
     label=$(m "$id" persistence)
     out="$mnt/ventoy/persistence/$name.dat"
-    [[ ! -e $out ]] || die "$out already exists — delete it first to recreate it"
+    [[ ! -e $out ]] || die "$out already exists; delete it first to recreate it"
 
     # Check free space up front rather than failing halfway through dd.
     if [[ -d $mnt ]]; then
@@ -43,5 +43,5 @@ persistence_create() {
     log "creating ${out#"$mnt"} (${size} MB, label $label) for [$id]"
     run mkdir -p "$mnt/ventoy/persistence"
     ventoy_run CreatePersistentImg.sh "${args[@]}"
-    ok "persistence image ready — boot $(m "$id" alias) and pick $name.dat in Ventoy's prompt"
+    ok "persistence image ready: boot $(m "$id" alias) and pick $name.dat in Ventoy's prompt"
 }

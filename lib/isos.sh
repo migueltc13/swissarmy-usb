@@ -2,7 +2,7 @@
 # Download, verify and place ISOs on the stick.
 #
 # Per-ISO state (version, sha256, source, date) lives in
-# <stick>/Files/.swissarmy/<id>.env — Files/ is ignored by Ventoy — and is
+# <stick>/Files/.swissarmy/<id>.env (Files/ is ignored by Ventoy) and is
 # what "up to date" checks and Files/isos.md are based on.
 
 FROM_DIR=${FROM_DIR:-}
@@ -60,14 +60,14 @@ download() {
             rm -rf "$out.d"
         else
             dir="$out.d"
-            warn "not enough free space in $cache — downloading straight to the stick (slow)"
+            warn "not enough free space in $cache, downloading straight to the stick (slow)"
         fi
         mkdir -p "$dir"
         log "downloading via BitTorrent into $dir (upstream only seeds this image)"
         # No DHT: the torrent's own trackers find the peers, and DHT only adds
         # a scary but harmless "Failed to load DHT routing table" error.
         # Preallocate: exFAT can't hold sparse files, so the first piece written
-        # far into the file zero-fills everything before it — a silent stall at
+        # far into the file zero-fills everything before it: a silent stall at
         # 0 B. Preallocating does that work up front, with a FileAlloc progress.
         aria2c --dir "$dir" --seed-time=0 --continue=true --file-allocation=prealloc \
             --enable-dht=false --enable-dht6=false --disk-cache=64M \
@@ -157,7 +157,7 @@ iso_fetch() {
     rm -f "$part.sha256"
     if [[ $got_dl == 0 ]]; then
         # Keep the partial download: the next run resumes it.
-        warn "[$id] download failed or interrupted — rerun to resume"
+        warn "[$id] download failed or interrupted; rerun to resume"
         echo fail; return
     fi
 
@@ -167,18 +167,18 @@ iso_fetch() {
             actual=$(sha256_progress "$part" "$(m "$id" file)")
         fi
         if [[ $actual != "$R_SHA256" ]]; then
-            warn "[$id] SHA256 mismatch (got ${actual:-nothing}, want $R_SHA256) — deleted"
+            warn "[$id] SHA256 mismatch (got ${actual:-nothing}, want $R_SHA256), deleted"
             rm -f "$part"
             echo fail; return
         fi
         ok "[$id] SHA256 ok"
     else
-        warn "[$id] upstream publishes no checksum — not verified"
+        warn "[$id] upstream publishes no checksum, not verified"
     fi
     if [[ $verify == sha256+gpg && $R_SIG_OF == iso ]]; then
         if ! { fetch "$R_SIG_URL" >"$tmp/iso.sig" \
             && gpg_verify "$(m "$id" gpg_key)" "$(m "$id" gpg_fpr)" "$tmp/iso.sig" "$part"; }; then
-            warn "[$id] GPG signature invalid — deleted"
+            warn "[$id] GPG signature invalid, deleted"
             rm -f "$part"
             echo fail; return
         fi
@@ -222,7 +222,7 @@ iso_manual() {
         fi
     fi
     if [[ -z $src ]]; then
-        warn "[$id] MISSING — manual download: $(m "$id" url)"
+        warn "[$id] MISSING, manual download: $(m "$id" url)"
         warn "[$id]   then: ./setup.sh isos --from ~/Downloads $id   (or copy it to $(iso_path "$id"))"
         echo missing; return
     fi

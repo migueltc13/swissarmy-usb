@@ -46,7 +46,7 @@ need_cmd() {
 }
 
 # fetch URL: print a (small) remote file to stdout. Read-only, so it also runs
-# in dry-run mode — resolving versions never changes anything.
+# in dry-run mode: resolving versions never changes anything.
 fetch() {
     curl -fsSL --retry 3 --connect-timeout 20 "$1"
 }

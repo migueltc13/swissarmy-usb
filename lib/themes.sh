@@ -17,7 +17,7 @@ themes_check_submodules() {
     local sub
     for sub in catppuccin-grub tokyo-night-grub grub2-themes; do
         [[ -n $(ls -A "$THEMES_DIR/$sub" 2>/dev/null) ]] \
-            || die "themes/$sub is empty — run: git submodule update --init --recursive"
+            || die "themes/$sub is empty; run: git submodule update --init --recursive"
     done
 }
 
@@ -58,7 +58,7 @@ themes_install() {
 }
 
 # themes_on_stick MNT: theme.txt paths (as Ventoy sees them) found on the
-# stick — the built-in three first, then any themes the user added.
+# stick: the built-in three first, then any themes the user added.
 themes_on_stick() {
     local mnt=$1 name dir
     for name in "${THEME_ORDER[@]}"; do

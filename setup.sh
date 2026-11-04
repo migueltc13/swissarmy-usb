@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# swissarmy-usb — build a multiboot USB stick with Ventoy.
+# swissarmy-usb: build a multiboot USB stick with Ventoy.
 # Run ./setup.sh --help for usage.
 set -euo pipefail
 
@@ -36,7 +36,7 @@ Usage: ./setup.sh [--dry-run] <command> [args] [options]
 
 Commands:
   deps [--qemu]                 apt install the required tools (+ QEMU/OVMF)
-  install <device>              install Ventoy (GPT + Secure Boot) — WIPES the device
+  install <device>              install Ventoy (GPT + Secure Boot), WIPES the device
   update  <device>              update Ventoy on an existing stick (keeps files)
   themes  [mount|device]        copy the GRUB themes to ventoy/theme/
   isos    [mount|device] [id…]  download/verify ISOs (all, or the given ids)
@@ -67,7 +67,7 @@ EOF
 cmd_deps() {
     local -a pkgs=(git curl jq gnupg aria2 pv exfatprogs dosfstools parted xz-utils udisks2 util-linux)
     ((WITH_QEMU)) && pkgs+=(qemu-system-x86 ovmf)
-    command -v apt-get >/dev/null || die "apt-get not found — this script targets Ubuntu/Debian"
+    command -v apt-get >/dev/null || die "apt-get not found; this script targets Ubuntu/Debian"
     log "installing: ${pkgs[*]}"
     as_root apt-get update
     as_root apt-get install -y "${pkgs[@]}"
@@ -178,7 +178,7 @@ cmd_test() {
     if [[ -w /dev/kvm ]]; then
         qemu+=(-enable-kvm)
     else
-        warn "/dev/kvm is not available — falling back to (slow) software emulation"
+        warn "/dev/kvm is not available, falling back to (slow) software emulation"
     fi
     if ((UEFI)); then
         for ovmf in /usr/share/ovmf/OVMF.fd /usr/share/qemu/OVMF.fd; do
@@ -210,7 +210,7 @@ cmd_all() {
     cmd_isos "$mnt" || status=$?
     cmd_config "$mnt"
     if ((status)); then
-        warn "some ISOs failed — rerun ./setup.sh isos $dev to retry them"
+        warn "some ISOs failed; rerun ./setup.sh isos $dev to retry them"
     else
         ok "done. Test it: ./setup.sh test $dev   (UEFI: ./setup.sh test $dev --uefi)"
     fi
@@ -242,7 +242,7 @@ main() {
         [[ -d $FROM_DIR ]] || die "--from: '$FROM_DIR' is not a directory"
         FROM_DIR=$(cd "$FROM_DIR" && pwd)
     fi
-    is_dry_run && log "dry run — nothing will be changed"
+    is_dry_run && log "dry run: nothing will be changed"
 
     local cmd=${args[0]}
     args=("${args[@]:1}")

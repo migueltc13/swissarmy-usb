@@ -7,7 +7,7 @@ VENTOY_RELEASES=https://github.com/ventoy/Ventoy/releases/download
 ventoy_version() {
     local v
     v=$(kv_get "$VENTOY_ROOT/VERSION" VERSION)
-    [[ -n $v ]] || die "ventoy/VERSION is missing — run: ./setup.sh ventoy-bump <version>"
+    [[ -n $v ]] || die "ventoy/VERSION is missing; run: ./setup.sh ventoy-bump <version>"
     echo "$v"
 }
 
@@ -53,7 +53,7 @@ ventoy_update() {
     local dev=$1
     device_check "$dev"
     device_show "$dev"
-    log "updating Ventoy on $dev to $(ventoy_version) — ISOs and config are kept"
+    log "updating Ventoy on $dev to $(ventoy_version) (ISOs and config are kept)"
     if ! is_dry_run; then
         confirm "Update Ventoy on $dev?" || die "aborted"
     fi
@@ -113,5 +113,5 @@ VERSION=$version
 SHA256=$expected
 URL=$VENTOY_RELEASES/v$version/$tarball
 EOF
-    ok "vendored Ventoy $version in ventoy/ventoy-$version — review and commit it"
+    ok "vendored Ventoy $version in ventoy/ventoy-$version; review and commit it"
 }

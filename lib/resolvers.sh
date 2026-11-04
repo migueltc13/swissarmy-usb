@@ -159,8 +159,8 @@ resolve_caine() {
     R_SUMS_URL="https://www.caine-live.net/page5/$R_NAME.sha256.txt"
 }
 
-# resolve_sourceforge PROJECT [REGEX]: the project's "best release" — the
-# file SourceForge offers on its big download button — plus its SHA256.
+# resolve_sourceforge PROJECT [REGEX]: the project's "best release" (the
+# file SourceForge offers on its big download button), plus its SHA256.
 # REGEX guards against the project switching that file to something else.
 resolve_sourceforge() {
     local project=$1 regex=${2:-} json file date

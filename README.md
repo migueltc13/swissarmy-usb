@@ -80,18 +80,18 @@ Where a command takes `[mount|device]` you can pass the mountpoint
 `udisksctl` if needed), or nothing at all: a mounted stick labelled
 `SWISSARMY` or `Ventoy` is found automatically.
 
-| Command | What it does |
-|---|---|
-| `deps [--qemu]` | `apt install` git, curl, jq, gnupg, aria2, exfatprogs, dosfstools, parted, xz-utils, udisks2 (+ qemu-system-x86, ovmf with `--qemu`) |
-| `install <device>` | Install Ventoy with GPT + Secure Boot (`Ventoy2Disk.sh -I -g -s`). **Wipes the device.** |
-| `update <device>` | Update Ventoy on an existing stick (`Ventoy2Disk.sh -u`). Keeps ISOs and config. |
-| `themes [mount\|device]` | Copy the three GRUB themes to `ventoy/theme/` |
-| `isos [mount\|device] [id…]` | Download, verify and place ISOs (all, or just the given ids) |
-| `config [mount\|device]` | Regenerate `ventoy/ventoy.json` and `Files/isos.md` |
-| `persistence <name> [mount\|device] --size MB` | Create `ventoy/persistence/<name>.dat` |
-| `test <device\|image> [--uefi]` | Boot the stick in QEMU |
-| `all <device>` | Everything above, in order |
-| `ventoy-bump <version>` | Vendor a different Ventoy release |
+| Command                                        | What it does                                                                                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `deps [--qemu]`                                | `apt install` git, curl, jq, gnupg, aria2, exfatprogs, dosfstools, parted, xz-utils, udisks2 (+ qemu-system-x86, ovmf with `--qemu`) |
+| `install <device>`                             | Install Ventoy with GPT + Secure Boot (`Ventoy2Disk.sh -I -g -s`). **Wipes the device.**                                             |
+| `update <device>`                              | Update Ventoy on an existing stick (`Ventoy2Disk.sh -u`). Keeps ISOs and config.                                                     |
+| `themes [mount\|device]`                       | Copy the three GRUB themes to `ventoy/theme/`                                                                                        |
+| `isos [mount\|device] [id…]`                   | Download, verify and place ISOs (all, or just the given ids)                                                                         |
+| `config [mount\|device]`                       | Regenerate `ventoy/ventoy.json` and `Files/isos.md`                                                                                  |
+| `persistence <name> [mount\|device] --size MB` | Create `ventoy/persistence/<name>.dat`                                                                                               |
+| `test <device\|image> [--uefi]`                | Boot the stick in QEMU                                                                                                               |
+| `all <device>`                                 | Everything above, in order                                                                                                           |
+| `ventoy-bump <version>`                        | Vendor a different Ventoy release                                                                                                    |
 
 Examples:
 
@@ -201,10 +201,10 @@ Three GRUB2 themes are included as submodules and copied to
 `<stick>/ventoy/theme/<name>/`. Each must contain a `theme.txt`, and
 `setup.sh` checks this.
 
-| Catppuccin Mocha | Tokyo Night | Vimix |
-|---|---|---|
-| ![Catppuccin Mocha](docs/screenshots/catppuccin-mocha.png) | ![Tokyo Night](docs/screenshots/tokyo-night.png) | ![Vimix](docs/screenshots/vimix.png) |
-| [catppuccin/grub](https://github.com/catppuccin/grub) | [mino29/tokyo-night-grub](https://github.com/mino29/tokyo-night-grub) | [vinceliuice/grub2-themes](https://github.com/vinceliuice/grub2-themes) |
+| Catppuccin Mocha                                           | Tokyo Night                                                           | Vimix                                                                   |
+| ---------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ![Catppuccin Mocha](docs/screenshots/catppuccin-mocha.png) | ![Tokyo Night](docs/screenshots/tokyo-night.png)                      | ![Vimix](docs/screenshots/vimix.png)                                    |
+| [catppuccin/grub](https://github.com/catppuccin/grub)      | [mino29/tokyo-night-grub](https://github.com/mino29/tokyo-night-grub) | [vinceliuice/grub2-themes](https://github.com/vinceliuice/grub2-themes) |
 
 Vimix is generated, not copied:
 `install.sh -t vimix -i color -s 1080p -g <outdir>`.
@@ -225,7 +225,7 @@ It is added to the list after the built-in three.
 ## Secure Boot
 
 Ventoy is installed with Secure Boot support (`-s`). **The first time** you boot
-the stick on a machine with Secure Boot enabled, you get a blue *MokManager*
+the stick on a machine with Secure Boot enabled, you get a blue _MokManager_
 screen:
 
 1. choose **Enroll key from disk**;
@@ -249,7 +249,7 @@ This creates `ventoy/persistence/kali.dat` with Ventoy's
 `CreatePersistentImg.sh` (ext4, label `persistence`, with a `persistence.conf`
 containing `/ union`) and adds a `persistence` entry for
 `/4-Security/kali-live.iso` to ventoy.json. When booting Kali, Ventoy asks
-whether to use the image. Pick it, then choose Kali's *Live USB Persistence*
+whether to use the image. Pick it, then choose Kali's _Live USB Persistence_
 boot entry.
 
 Ubuntu also works (`./setup.sh persistence ubuntu --size 4096`, label

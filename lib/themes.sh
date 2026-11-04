@@ -2,6 +2,8 @@
 # GRUB2 themes (git submodules) copied to <stick>/ventoy/theme/<name>/.
 
 THEMES_DIR="$REPO_DIR/themes"
+# Per-theme theme.txt overrides, plus the shared swissarmy-logo.png.
+ASSETS_DIR="$REPO_DIR/assets/themes"
 
 # name -> source directory inside the submodules. Vimix is generated below.
 declare -A THEME_SRC=(
@@ -46,10 +48,10 @@ themes_install() {
         if ! is_dry_run; then
             [[ -f $dest/theme.txt ]] || die "copy failed: $dest/theme.txt missing"
         fi
-        # Catppuccin's menu is 30% of the screen: 4 rows at 1280x720, which
-        # hides the 5th section. 45% still ends above the tip line at 81%.
-        if [[ $name == catppuccin-mocha ]]; then
-            run sed -i '/^+ boot_menu {/,/^}/s/^\( *height = \)30%/\145%/' "$dest/theme.txt"
+        # Our tweaks (layout for 1280x720 + the swissarmy-usb logo) are
+        # copied over the theme.
+        if [[ -d $ASSETS_DIR/$name ]]; then
+            run cp -r "$ASSETS_DIR/$name/." "$ASSETS_DIR/swissarmy-logo.png" "$dest/"
         fi
     done
     ok "themes installed: ${THEME_ORDER[*]}"

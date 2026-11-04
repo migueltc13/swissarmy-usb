@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo/swissarmy-usb.png" alt="swissarmy-usb: one stick, every tool" width="640">
+</p>
+
 # swissarmy-usb
 
 One script to build a **multiboot USB stick** with [Ventoy](https://www.ventoy.net)
@@ -5,8 +9,6 @@ on Ubuntu Linux: installers, disk tools, rescue systems, security distros and
 offline antivirus, all on one stick with a themed boot menu.
 
 ![The stick booting with the Catppuccin Mocha theme](docs/screenshots/catppuccin-mocha.png)
-
-![Inside the Installers folder](docs/screenshots/catppuccin-mocha-installers.png)
 
 Everything lives in this repository (pinned Ventoy release, themes, ISO
 manifest, scripts) except the ISOs themselves, which `setup.sh` downloads and
@@ -217,9 +219,14 @@ Vimix is generated, not copied:
 picks one at random on every boot. Run `./setup.sh config` after changing it.
 `gfxmode` is a list tried in order: `1280x720` keeps the menu text large on
 small laptop screens and scales cleanly to 1080p, with `auto` as a fallback
-for firmware that doesn't offer it. Catppuccin's menu is made taller when it
-is copied to the stick, so all five sections fit at 720p. Other theme
-settings (`gfxmode`, `display_mode`) and Ventoy options (`control`,
+for firmware that doesn't offer it.
+
+**Our tweaks.** `assets/themes/<name>/` is copied over a theme on the stick:
+Catppuccin and Tokyo Night get the swissarmy-usb logo and a `theme.txt` laid
+out so all five sections fit at 720p. The logo sources are the SVGs in
+[`docs/logo/`](docs/logo).
+
+Other theme settings (`gfxmode`, `display_mode`) and Ventoy options (`control`,
 `menu_tip` position and colour) live in the same template. Values in the
 generated lists (theme files, aliases, tips, persistence) are merged into the
 template.

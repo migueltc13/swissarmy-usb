@@ -1,0 +1,49 @@
+name: Broken ISO download
+description: An ISO no longer resolves, downloads or verifies.
+title: "[iso] <id>: "
+labels: ["iso"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Upstream projects change their download pages from time to time.
+        The dry run below only reads remote metadata and changes nothing.
+  - type: input
+    id: iso
+    attributes:
+      label: ISO id
+      description: The entry's id in `isos.conf`, e.g. `kali-live`.
+      placeholder: kali-live
+    validations:
+      required: true
+  - type: dropdown
+    id: what
+    attributes:
+      label: What goes wrong?
+      options:
+        - It can't find the latest release
+        - The download fails
+        - The SHA256 check fails
+        - The GPG signature check fails
+        - The ISO is on the stick but doesn't boot
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Dry-run output
+      description: Paste the output of `./setup.sh -n isos <id>`.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?
+      description: A link to the project's new download page helps a lot.
+  - type: input
+    id: version
+    attributes:
+      label: Commit
+      description: Output of `git rev-parse --short HEAD`.

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ventoy problems
+    url: https://github.com/ventoy/Ventoy/issues
+    about: Problems with Ventoy itself (booting a specific ISO, Secure Boot, plugins).

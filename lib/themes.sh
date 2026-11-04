@@ -2,8 +2,8 @@
 # GRUB2 themes (git submodules) copied to <stick>/ventoy/theme/<name>/.
 
 THEMES_DIR="$REPO_DIR/themes"
-# Per-theme theme.txt overrides, plus the shared swissarmy-logo.png.
-ASSETS_DIR="$REPO_DIR/assets/themes"
+# Our per-theme theme.txt overrides, plus the shared swissarmy-logo.png.
+OVERRIDES_DIR="$THEMES_DIR/overrides"
 
 # name -> source directory inside the submodules. Vimix is generated below.
 declare -A THEME_SRC=(
@@ -50,8 +50,8 @@ themes_install() {
         fi
         # Our tweaks (layout for 1280x720 + the swissarmy-usb logo) are
         # copied over the theme.
-        if [[ -d $ASSETS_DIR/$name ]]; then
-            run cp -r "$ASSETS_DIR/$name/." "$ASSETS_DIR/swissarmy-logo.png" "$dest/"
+        if [[ -d $OVERRIDES_DIR/$name ]]; then
+            run cp -r "$OVERRIDES_DIR/$name/." "$OVERRIDES_DIR/swissarmy-logo.png" "$dest/"
         fi
     done
     ok "themes installed: ${THEME_ORDER[*]}"

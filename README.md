@@ -236,7 +236,7 @@ picks one at random on every boot. Run `./setup.sh config` after changing it.
 small laptop screens and scales cleanly to 1080p, with `auto` as a fallback
 for firmware that doesn't offer it.
 
-**Our tweaks.** `assets/themes/<name>/` is copied over a theme on the stick:
+**Our tweaks.** `themes/overrides/<name>/` is copied over a theme on the stick:
 Catppuccin and Tokyo Night get the swissarmy-usb logo and a `theme.txt` laid
 out so all five sections fit at 720p. The logo sources are the SVGs in
 [`.github/assets/logo/`](.github/assets/logo).

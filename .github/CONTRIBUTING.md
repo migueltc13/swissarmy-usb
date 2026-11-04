@@ -33,9 +33,9 @@ sudo apt install shellcheck   # and Node.js for prettier
   dependencies unless Ubuntu ships them.
 - **Safety checks stay strict.** Changes to `lib/device.sh` must keep refusing
   non-removable disks, partitions, system mounts and the disk holding `/`.
-- **Don't edit `ventoy/` or `themes/`.** They are kept exactly as upstream
-  ships them. Theme tweaks go in `assets/themes/<name>/`, and Ventoy updates go
-  through `./setup.sh ventoy-bump <version>`.
+- **Don't edit `ventoy/` or the theme submodules.** They are kept exactly as
+  upstream ships them. Theme tweaks go in `themes/overrides/`, and Ventoy
+  updates go through `./setup.sh ventoy-bump <version>`.
 - **Never commit ISOs or images.** `.gitignore` excludes `*.iso`, `*.img` and
   `*.dat`.
 

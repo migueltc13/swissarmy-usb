@@ -52,7 +52,10 @@ download() {
         log "downloading via BitTorrent (upstream only seeds this image)"
         # No DHT: the torrent's own trackers find the peers, and DHT only adds
         # a scary but harmless "Failed to load DHT routing table" error.
-        aria2c --dir "$dir" --seed-time=0 --continue=true --file-allocation=none \
+        # Preallocate: exFAT can't hold sparse files, so the first piece written
+        # far into the file zero-fills everything before it — a silent stall at
+        # 0 B. Preallocating does that work up front, with a FileAlloc progress.
+        aria2c --dir "$dir" --seed-time=0 --continue=true --file-allocation=prealloc \
             --enable-dht=false --enable-dht6=false \
             --summary-interval=0 --console-log-level=warn "$torrent" >&2 || return 1
         # Single-file torrent: move the payload to OUT.

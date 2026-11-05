@@ -369,8 +369,8 @@ SWISSARMY_ALLOW_LOOP=1 ./setup.sh install "$LOOP"   # loop devices need this opt
 sudo losetup -d "$LOOP"
 ```
 
-`shellcheck -x setup.sh lib/*.sh share/bash-completion/completions/*` should
-stay clean.
+`shellcheck -x setup.sh lib/*.sh share/bash-completion/completions/* .github/scripts/*.sh`
+should stay clean, and `.github/scripts/test-completion.sh` should pass.
 
 ## Licenses
 

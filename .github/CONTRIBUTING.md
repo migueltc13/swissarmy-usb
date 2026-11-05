@@ -43,7 +43,9 @@ sudo apt install shellcheck   # and Node.js for prettier
 
 ```sh
 # must be clean
-shellcheck -x setup.sh lib/*.sh share/bash-completion/completions/*
+shellcheck -x setup.sh lib/*.sh share/bash-completion/completions/* .github/scripts/*.sh
+# completion answers
+.github/scripts/test-completion.sh
 # Markdown, JSON and YAML formatting
 npx prettier --check . '!ventoy/**' '!themes/**'
 # every resolver still finds a release
@@ -54,10 +56,11 @@ The last one is a dry run against a stick path that doesn't exist, so it
 needs no stick and downloads nothing. GitHub Actions runs the same checks on
 every pull request, and the resolver check also runs weekly.
 
-Adding or changing a command or option? Update `--help` in `setup.sh`, the
-man page in `share/man/man1/swissarmy-usb.1` and the bash completion in
-`share/bash-completion/completions/swissarmy-usb`. CI fails when `--help`
-lists something the man page doesn't.
+Adding or changing a command or option? Add or change its line in the table
+at the top of [`lib/cli.sh`](../lib/cli.sh): `--help` and the bash and zsh
+completion are built from it. Then handle it in `setup.sh` and describe it in
+the man page, `share/man/man1/swissarmy-usb.1`. CI fails when `--help` lists
+something the man page doesn't, and tests the completion answers.
 
 For changes to installing, themes or the boot menu, also boot a loop-device
 image with `./setup.sh test stick.img` (add `--uefi` for UEFI) and check the

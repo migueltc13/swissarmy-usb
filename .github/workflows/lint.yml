@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: shellcheck
-        run: shellcheck -x setup.sh lib/*.sh share/bash-completion/completions/swissarmy-usb
+        run: shellcheck -x setup.sh lib/*.sh share/bash-completion/completions/* .github/scripts/*.sh
 
       # ventoy/ and themes/ are upstream code, kept exactly as shipped.
       - name: prettier
@@ -33,3 +33,11 @@ jobs:
             grep -qF -- "$word" <<<"$text" || { echo "::error::'$word' is in --help but not in $man"; missing=1; }
           done
           exit $missing
+
+      - name: completion answers
+        run: .github/scripts/test-completion.sh
+
+      - name: zsh completion parses
+        run: |
+          sudo apt-get install -y -qq zsh >/dev/null
+          zsh -n share/zsh/site-functions/_swissarmy-usb

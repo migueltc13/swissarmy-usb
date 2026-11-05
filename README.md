@@ -287,13 +287,13 @@ Vimix is generated, not copied:
 [`config/ventoy.tmpl.json`](config/ventoy.tmpl.json) chooses the theme:
 `1` (the default), `2`, `3` select Catppuccin, Tokyo Night or Vimix, and `0`
 picks one at random on every boot. Run `./setup.sh config` after changing it.
-`gfxmode` is a list tried in order: `1280x720` keeps the menu text large on
-small laptop screens and scales cleanly to 1080p, with `auto` as a fallback
-for firmware that doesn't offer it.
+`gfxmode` is `auto`, so the firmware picks the mode (usually the panel's
+native resolution), which looked best across the laptops tested. To force a
+mode, give a list tried in order, e.g. `"1280x720,auto"`.
 
 **Our tweaks.** `themes/overrides/<name>/` is copied over a theme on the stick:
 Catppuccin and Tokyo Night get the swissarmy-usb logo and a `theme.txt` laid
-out so all five sections fit at 720p. The logo sources are the SVGs in
+out so all five sections fit even at 720p. The logo sources are the SVGs in
 [`.github/assets/logo/`](.github/assets/logo).
 
 Other theme settings (`gfxmode`, `display_mode`) and Ventoy options (`control`,

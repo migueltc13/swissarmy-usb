@@ -48,8 +48,8 @@ themes_install() {
         if ! is_dry_run; then
             [[ -f $dest/theme.txt ]] || die "copy failed: $dest/theme.txt missing"
         fi
-        # Our tweaks (layout for 1280x720 + the swissarmy-usb logo) are
-        # copied over the theme.
+        # Our tweaks (a layout that fits down to 1280x720 + the swissarmy-usb
+        # logo) are copied over the theme.
         if [[ -d $OVERRIDES_DIR/$name ]]; then
             run cp -r "$OVERRIDES_DIR/$name/." "$OVERRIDES_DIR/swissarmy-logo.png" "$dest/"
         fi

@@ -6,7 +6,7 @@
   ],
   "theme": {
     "default_file": 1,
-    "gfxmode": "1280x720,auto",
+    "gfxmode": "auto",
     "display_mode": "GUI",
     "ventoy_color": "#89b4fa",
     "resolution_fit": 1

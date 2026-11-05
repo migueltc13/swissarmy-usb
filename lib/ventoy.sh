@@ -112,6 +112,7 @@ ventoy_bump() {
 VERSION=$version
 SHA256=$expected
 URL=$VENTOY_RELEASES/v$version/$tarball
+SOURCE=https://github.com/ventoy/Ventoy/tree/v$version
 EOF
     ok "vendored Ventoy $version in ventoy/ventoy-$version; review and commit it"
 }

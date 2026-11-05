@@ -325,6 +325,9 @@ sudo losetup -d "$LOOP"
 
 - This repository's scripts and config: [MIT](LICENSE).
 - Ventoy (vendored in `ventoy/`): **GPLv3**, see `ventoy/ventoy-*/COPYING`.
+  The files are Ventoy's official Linux release, unmodified. Its source code
+  is at the tag named in the `SOURCE` line of
+  [`ventoy/VERSION`](ventoy/VERSION).
 - Themes keep their own licenses: Catppuccin GRUB (MIT), Tokyo Night GRUB
   (MIT), grub2-themes/Vimix (GPLv3). See each submodule's `LICENSE`.
 - The ISOs belong to their projects and are downloaded from them. None are

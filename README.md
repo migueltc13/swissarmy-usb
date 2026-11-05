@@ -62,6 +62,21 @@ updates them whenever upstream releases a new version.
 
 Then boot it in a VM to check: `./setup.sh test /dev/sdb`.
 
+### Run it from anywhere
+
+Link `setup.sh` into a folder on your `PATH` (run this inside the repo):
+
+```sh
+mkdir -p ~/.local/bin
+ln -s "$PWD/setup.sh" ~/.local/bin/swissarmy-usb
+```
+
+Then `swissarmy-usb isos`, `swissarmy-usb test /dev/sdb` and so on work from
+any directory, and its hints use that name too. The link finds `lib/`,
+`isos.conf` and the rest next to the real `setup.sh`, so keep the clone where
+it is. On Ubuntu, `~/.local/bin` is added to `PATH` at login once it exists,
+so log out and back in if `swissarmy-usb` isn't found yet.
+
 ## What ends up on the stick
 
 ```

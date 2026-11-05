@@ -1,0 +1,112 @@
+# shellcheck shell=bash
+# Bash completion for swissarmy-usb (a symlink to setup.sh, see "link").
+# ISO ids are read live from the clone's isos.conf, so new entries complete
+# without changing this file.
+
+# The clone behind the swissarmy-usb command.
+_swissarmy_usb_repo() {
+    local bin
+    bin=$(command -v swissarmy-usb 2>/dev/null) || return 1
+    dirname "$(readlink -f "$bin")"
+}
+
+# ISO ids in isos.conf; "persistence" lists only the ids that support it.
+_swissarmy_usb_ids() {
+    local conf
+    conf="$(_swissarmy_usb_repo)/isos.conf" || return 0
+    [[ -f $conf ]] || return 0
+    if [[ ${1:-} == persistence ]]; then
+        awk '/^\[/ { id = "" }
+             /^\[[a-z0-9][a-z0-9-]*\]$/ { id = substr($0, 2, length($0) - 2) }
+             id != "" && /^persistence[[:space:]]*=/ { print id }' "$conf"
+    else
+        sed -n 's/^\[\([a-z0-9][a-z0-9-]*\)\]$/\1/p' "$conf"
+    fi
+}
+
+# Removable or USB whole disks (the only ones "install" accepts), skipping
+# empty card-reader slots.
+_swissarmy_usb_disks() {
+    lsblk -dnbpo NAME,TYPE,RM,SIZE,TRAN 2>/dev/null \
+        | awk '$2 == "disk" && $4 > 0 && ($3 == 1 || $5 == "usb") { print $1 }'
+}
+
+# Mounted sticks (labelled SWISSARMY or Ventoy) and USB disks.
+_swissarmy_usb_sticks() {
+    lsblk -nlo LABEL,MOUNTPOINT 2>/dev/null \
+        | awk '($1 == "SWISSARMY" || $1 == "Ventoy") && $2 != "" { print $2 }'
+    _swissarmy_usb_disks
+}
+
+_swissarmy_usb() {
+    local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD - 1]}
+    local cmd='' npos=0 i word opts
+    COMPREPLY=()
+
+    # The command is the first word that isn't an option (or an option's
+    # value); npos counts its arguments before the cursor.
+    for ((i = 1; i < COMP_CWORD; i++)); do
+        word=${COMP_WORDS[i]}
+        case $word in
+            --from | --size) ((i++)) ;;
+            -*) ;;
+            *) if [[ -z $cmd ]]; then cmd=$word; else ((npos++)); fi ;;
+        esac
+    done
+
+    case $prev in
+        --from)
+            compopt -o filenames
+            mapfile -t COMPREPLY < <(compgen -d -- "$cur")
+            return ;;
+        --size) return ;;
+    esac
+
+    if [[ $cur == -* ]]; then
+        opts='-n --dry-run -h --help'
+        case $cmd in
+            deps) opts+=' --qemu' ;;
+            isos) opts+=' --from --replace' ;;
+            persistence) opts+=' --size' ;;
+            test) opts+=' --uefi' ;;
+            '') opts+=' --from --replace --size --uefi --qemu' ;;
+        esac
+        mapfile -t COMPREPLY < <(compgen -W "$opts" -- "$cur")
+        return
+    fi
+
+    if [[ -z $cmd ]]; then
+        mapfile -t COMPREPLY < <(compgen -W 'deps install update themes isos config
+            persistence test all ventoy-bump link unlink help' -- "$cur")
+        return
+    fi
+
+    case $cmd in
+        install | update | all)
+            ((npos == 0)) && mapfile -t COMPREPLY < <(compgen -W "$(_swissarmy_usb_disks)" -- "$cur") ;;
+        themes | config)
+            ((npos == 0)) && mapfile -t COMPREPLY < <(compgen -W "$(_swissarmy_usb_sticks)" -- "$cur") ;;
+        isos)
+            # A path or device first, otherwise ISO ids.
+            if [[ $cur == /* || $cur == .* ]]; then
+                ((npos == 0)) && mapfile -t COMPREPLY < <(compgen -W "$(_swissarmy_usb_sticks)" -- "$cur")
+            else
+                mapfile -t COMPREPLY < <(compgen -W "$(_swissarmy_usb_ids)" -- "$cur")
+            fi ;;
+        persistence)
+            case $npos in
+                0) mapfile -t COMPREPLY < <(compgen -W "$(_swissarmy_usb_ids persistence)" -- "$cur") ;;
+                1) mapfile -t COMPREPLY < <(compgen -W "$(_swissarmy_usb_sticks)" -- "$cur") ;;
+            esac ;;
+        test)
+            if ((npos == 0)); then
+                compopt -o filenames
+                mapfile -t COMPREPLY < <(
+                    compgen -W "$(_swissarmy_usb_disks)" -- "$cur"
+                    compgen -f -X '!*.img' -- "$cur"
+                    compgen -d -- "$cur")
+            fi ;;
+    esac
+}
+
+complete -F _swissarmy_usb swissarmy-usb

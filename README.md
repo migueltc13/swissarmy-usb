@@ -3,6 +3,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/migueltc13/swissarmy-usb/actions/workflows/lint.yml"><img src="https://github.com/migueltc13/swissarmy-usb/actions/workflows/lint.yml/badge.svg?branch=main" alt="Lint"></a>
+  <a href="https://github.com/migueltc13/swissarmy-usb/actions/workflows/resolvers.yml"><img src="https://github.com/migueltc13/swissarmy-usb/actions/workflows/resolvers.yml/badge.svg?branch=main" alt="Resolvers"></a>
+  <a href="https://github.com/migueltc13/swissarmy-usb/actions/workflows/github-code-scanning/codeql"><img src="https://github.com/migueltc13/swissarmy-usb/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main" alt="CodeQL"></a>
+</p>
+
+<p align="center">
   One script to build a <b>multiboot USB stick</b> with <a href="https://www.ventoy.net">Ventoy</a>
   on Ubuntu Linux:<br>installers, disk tools, rescue systems, security distros and
   offline antivirus,<br>all on one stick with a themed boot menu.

@@ -54,6 +54,7 @@ cli_option "--size <MB>"   -   persistence "persistence image size (default 4096
 cli_option "--uefi"        -   test        "test: boot with OVMF (UEFI) instead of BIOS"
 cli_option "--qemu"        -   deps        "deps: also install qemu-system-x86 and ovmf"
 cli_option "-h, --help"    -   "*"         "show this help"
+cli_option "-v, --version" -   "*"         "show the version"
 
 # --- --help ----------------------------------------------------------------
 

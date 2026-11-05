@@ -35,6 +35,9 @@ UEFI=0
 WITH_QEMU=0
 AUTO_CONFIG=1
 
+# The version is in VERSION, at the top of the repository.
+version() { echo "swissarmy-usb $(<"$REPO_DIR/VERSION")"; }
+
 usage() {
     echo "Usage: $PROG [--dry-run] <command> [args] [options]"
     echo
@@ -238,6 +241,7 @@ main() {
             --uefi) UEFI=1 ;;
             --qemu) WITH_QEMU=1 ;;
             -h | --help) usage; exit 0 ;;
+            -v | --version) version; exit 0 ;;
             --) shift; args+=("$@"); break ;;
             -*) die "unknown option '$1' (see --help)" ;;
             *) args+=("$1") ;;

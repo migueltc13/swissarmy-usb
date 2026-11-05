@@ -33,8 +33,8 @@ check "commands after an option" "deps install update themes isos config persist
 check "isos: ISO ids" "$ids" isos ""
 check "isos: more ids" "$ids" isos kali-live ""
 check "isos: ids after --from DIR" "$ids" --from /tmp isos ""
-check "isos: its options" "-n --dry-run --from --replace -h --help" isos -
-check "test: its options" "-n --dry-run --uefi -h --help" test -
+check "isos: its options" "-n --dry-run --from --replace -h --help -v --version" isos -
+check "test: its options" "-n --dry-run --uefi -h --help -v --version" test -
 check "--from: directories" ":dirs" isos --from ""
 check "--size: no suggestions" "" persistence --size ""
 check "persistence: ids with persistence" "$pids" persistence ""

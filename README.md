@@ -140,7 +140,7 @@ aliases and tips keep working across updates. Only amd64/x86_64 images are used.
 
 Every command accepts `--dry-run` (`-n`): it prints what would happen and
 changes nothing. Resolving versions and checking signatures still runs, since
-it only reads.
+it only reads. `--version` (`-v`) shows which version you have.
 
 Where a command takes `[mount|device]` you can pass the mountpoint
 (`/media/$USER/SWISSARMY`), the device (`/dev/sdb`, which is mounted with

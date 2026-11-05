@@ -2,7 +2,7 @@
 # Generate <stick>/ventoy/ventoy.json and <stick>/Files/isos.md from the
 # manifest plus the per-ISO state recorded by `setup.sh isos`.
 
-CONFIG_TMPL="$REPO_DIR/config/ventoy.json.tmpl"
+CONFIG_TMPL="$REPO_DIR/config/ventoy.tmpl.json"
 
 # iso_tip ID STATEFILE: "version · language · description"
 iso_tip() {
@@ -132,7 +132,7 @@ config_isos_md() {
 config_write() {
     local mnt=$1 tmp json
     [[ -f $CONFIG_TMPL ]] || die "missing $CONFIG_TMPL"
-    jq empty "$CONFIG_TMPL" || die "config/ventoy.json.tmpl is not valid JSON"
+    jq empty "$CONFIG_TMPL" || die "config/ventoy.tmpl.json is not valid JSON"
     tmp=$(make_tmp)
     config_generated "$mnt" >"$tmp/generated.json"
     # Template first so it carries user settings; generated lists are merged in.

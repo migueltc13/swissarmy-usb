@@ -247,7 +247,7 @@ Vimix is generated, not copied:
 `install.sh -t vimix -i color -s 1080p -g <outdir>`.
 
 **Picking a theme.** `default_file` in
-[`config/ventoy.json.tmpl`](config/ventoy.json.tmpl) chooses the theme:
+[`config/ventoy.tmpl.json`](config/ventoy.tmpl.json) chooses the theme:
 `1` (the default), `2`, `3` select Catppuccin, Tokyo Night or Vimix, and `0`
 picks one at random on every boot. Run `./setup.sh config` after changing it.
 `gfxmode` is a list tried in order: `1280x720` keeps the menu text large on

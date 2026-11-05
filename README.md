@@ -148,6 +148,11 @@ you rarely need to run `config` by hand.
 Nothing runs the destructive step without that typed confirmation. There is no
 `--yes`.
 
+The other commands (`themes`, `isos`, `config`, `persistence`) only write to a
+Ventoy stick: the target's disk must carry Ventoy's `VTOYEFI` partition, so a
+mistyped device or a mounted backup drive is refused. `isos` also locks the
+stick, so two runs can't download onto it at the same time.
+
 Ventoy's scripts write logs and unpack tools into their own directory as root,
 so `setup.sh` runs them from a temporary copy and the vendored tree stays
 clean.

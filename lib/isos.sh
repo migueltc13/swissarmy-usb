@@ -264,6 +264,14 @@ isos_sync() {
     done
     isos_layout "$mnt"
 
+    # One run per stick: two at once would write to the same partial
+    # downloads. The lock lasts until setup.sh exits, and an aria2c left
+    # behind by an interrupted run keeps holding it until it has stopped.
+    if ! is_dry_run; then
+        exec 9>"$(state_dir "$mnt")/.lock"
+        flock -n 9 || die "another setup.sh (or its download) is still working on this stick"
+    fi
+
     for id in "${ids[@]}"; do
         if is_manual "$id"; then
             result=$(iso_manual "$mnt" "$id")

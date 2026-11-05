@@ -1,0 +1,5 @@
+# GitHub language statistics (Linguist)
+# The vendored Ventoy release is upstream code, not this project's.
+ventoy/** linguist-vendored
+# A JSON template, not a Go template.
+*.json.tmpl linguist-language=JSON

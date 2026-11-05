@@ -230,17 +230,30 @@ Add a section to [`isos.conf`](isos.conf):
 
 ```ini
 [gparted]
-folder  = 2-Disk-Tools          # one of the [folder:…] sections
-file    = gparted.iso           # name on the stick, no version
-alias   = GParted Live          # menu name
-tip     = Graphical partition editor
-lang    = Multilingual          # optional
-source  = gparted               # resolver (+ args), or "manual"
-verify  = sha256                # sha256 | sha256+gpg | none
-# gpg_key = https://…/key.asc   # with sha256+gpg
-# gpg_fpr = 0123…CDEF           # with sha256+gpg
-# pin     = 1.8.1-6             # optional
+folder = 2-Disk-Tools
+file   = gparted.iso
+alias  = GParted Live
+tip    = Graphical partition editor
+lang   = Multilingual
+source = gparted
+verify = sha256
+# gpg_key = https://…/key.asc
+# gpg_fpr = 0123…CDEF
+# pin     = 1.8.1-6
 ```
+
+| Key       | Value                                                         |
+| --------- | ------------------------------------------------------------- |
+| `folder`  | one of the `[folder:…]` sections                              |
+| `file`    | name on the stick, no version                                 |
+| `alias`   | menu name                                                     |
+| `tip`     | short description (version and language are added)            |
+| `lang`    | language(s), optional                                         |
+| `source`  | resolver (+ args), or `manual`                                |
+| `verify`  | `sha256`, `sha256+gpg` or `none`                              |
+| `gpg_key` | URL of the signing key (with `sha256+gpg`)                    |
+| `gpg_fpr` | expected fingerprint of that key (with `sha256+gpg`)          |
+| `pin`     | optional version pin, see [Version pinning](#version-pinning) |
 
 Then run `./setup.sh isos gparted`.
 

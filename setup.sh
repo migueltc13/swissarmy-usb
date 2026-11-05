@@ -3,7 +3,8 @@
 # Run ./setup.sh --help for usage.
 set -euo pipefail
 
-REPO_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# Resolve symlinks, so a link to setup.sh (e.g. ~/.local/bin/swissarmy-usb) works.
+REPO_DIR=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
 
 # shellcheck source=lib/common.sh
 source "$REPO_DIR/lib/common.sh"

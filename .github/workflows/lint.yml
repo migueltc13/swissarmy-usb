@@ -17,5 +17,6 @@ jobs:
       - name: shellcheck
         run: shellcheck -x setup.sh lib/*.sh
 
+      # ventoy/ and themes/ are upstream code, kept exactly as shipped.
       - name: prettier
-        run: npx --yes prettier@3.9.9 --check .
+        run: npx --yes prettier@3.9.9 --check . '!ventoy/**' '!themes/**'

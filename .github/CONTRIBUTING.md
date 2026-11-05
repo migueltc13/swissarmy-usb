@@ -42,9 +42,9 @@ sudo apt install shellcheck   # and Node.js for prettier
 ## Before opening a pull request
 
 ```sh
-shellcheck -x setup.sh lib/*.sh   # must be clean
-npx prettier --check .            # Markdown, JSON and YAML formatting
-./setup.sh -n isos /tmp/nostick   # every resolver still finds a release
+shellcheck -x setup.sh lib/*.sh                   # must be clean
+npx prettier --check . '!ventoy/**' '!themes/**'  # Markdown, JSON, YAML
+./setup.sh -n isos /tmp/nostick                   # every resolver resolves
 ```
 
 The last one is a dry run against a stick path that doesn't exist, so it

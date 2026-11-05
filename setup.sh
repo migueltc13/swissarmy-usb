@@ -201,6 +201,8 @@ cmd_all() {
     device_check "$dev"
     log "plan for $dev: deps -> install Ventoy (WIPES $dev) -> label $STICK_LABEL -> themes -> isos -> config"
     cmd_deps
+    # A dry run doesn't install Ventoy, so later steps can't verify the stick.
+    is_dry_run && STICK_PLANNED=1
     ventoy_install "$dev"
     ventoy_relabel "$dev" "$STICK_LABEL"
     mnt=$(device_mount_data "$dev")

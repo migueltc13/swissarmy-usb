@@ -126,13 +126,34 @@ device_mount_data() {
     echo "$mnt"
 }
 
+# Set by "all" in dry-run mode: the stick is only about to become a Ventoy
+# stick, so stick_check can't confirm it yet.
+STICK_PLANNED=0
+
+# is_ventoy_disk DISK: DISK carries Ventoy's VTOYEFI partition.
+is_ventoy_disk() { lsblk -nlo LABEL "$1" 2>/dev/null | grep -qx VTOYEFI; }
+
+# stick_check MNT: refuse to write into anything that is not the data
+# partition of a Ventoy stick (an internal disk, a backup drive, ...).
+stick_check() {
+    local mnt=$1 src disk
+    ((STICK_PLANNED)) && return 0
+    src=$(findmnt -no SOURCE --mountpoint "$mnt" 2>/dev/null | head -n 1)
+    disk=$(lsblk -no PKNAME "$src" 2>/dev/null | head -n 1)
+    if [[ -z $disk ]] || ! is_ventoy_disk "/dev/$disk"; then
+        die "$mnt is not on a Ventoy stick (no VTOYEFI partition on ${disk:+/dev/}${disk:-its disk}), refusing"
+    fi
+}
+
 # resolve_mount [ARG]: accept a mountpoint, a device, or nothing (auto-detect a
-# mounted partition labelled SWISSARMY or Ventoy). Prints the mountpoint.
+# mounted partition labelled SWISSARMY or Ventoy). Prints the mountpoint after
+# checking that it belongs to a Ventoy stick.
 resolve_mount() {
     local arg=${1:-} mnt
     if [[ -z $arg ]]; then
         mnt=$(lsblk -nlo LABEL,MOUNTPOINT | awk '($1=="SWISSARMY"||$1=="Ventoy") && $2!=""{print $2; exit}')
         [[ -n $mnt ]] || die "no mounted SWISSARMY/Ventoy stick found; pass a mountpoint or device"
+        stick_check "$mnt"
         log "using detected stick at $mnt"
         echo "$mnt"
         return
@@ -141,11 +162,15 @@ resolve_mount() {
         if [[ $(lsblk_field TYPE "$arg") == part ]]; then
             arg=/dev/$(lsblk_field PKNAME "$arg")
         fi
+        # Check before mounting anything.
+        ((STICK_PLANNED)) || is_ventoy_disk "$arg" \
+            || die "$arg is not a Ventoy stick (no VTOYEFI partition); run: ./setup.sh install $arg"
         device_mount_data "$arg"
         return
     fi
     if [[ -d $arg ]]; then
         mountpoint -q "$arg" || die "$arg is not a mountpoint, refusing to write ISOs into a plain directory"
+        stick_check "$arg"
         [[ -w $arg ]] || die "$arg is not writable by $USER (mount it with udisksctl or your file manager)"
         (cd "$arg" && pwd)
         return

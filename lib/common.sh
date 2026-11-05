@@ -3,6 +3,11 @@
 
 DRY_RUN=${DRY_RUN:-0}
 
+# How we were run, for hints the user can copy: the bare name when it was
+# found on PATH (e.g. swissarmy-usb), otherwise the path they typed (./setup.sh).
+PROG=$0
+[[ $(command -v "${0##*/}" 2>/dev/null) == "$0" ]] && PROG=${0##*/}
+
 if [[ -t 2 ]]; then
     C_BLUE=$'\033[1;34m' C_YELLOW=$'\033[1;33m' C_RED=$'\033[1;31m'
     C_GREEN=$'\033[1;32m' C_RESET=$'\033[0m'
@@ -41,7 +46,7 @@ need_cmd() {
     local cmd
     for cmd in "$@"; do
         command -v "$cmd" >/dev/null 2>&1 \
-            || die "missing command '$cmd' (run: ./setup.sh deps)"
+            || die "missing command '$cmd' (run: $PROG deps)"
     done
 }
 

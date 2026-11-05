@@ -23,7 +23,7 @@ config_generated() {
     local -a themes=() items=()
 
     mapfile -t themes < <(themes_on_stick "$mnt")
-    ((${#themes[@]})) || warn "no themes on the stick yet (run: ./setup.sh themes)"
+    ((${#themes[@]})) || warn "no themes on the stick yet (run: $PROG themes)"
 
     for folder in "${FOLDER_IDS[@]}"; do
         items+=("$(jq -nc --arg d "/$folder" --arg a "$(m "folder:$folder" alias)" --arg t "$(m "folder:$folder" tip)" \

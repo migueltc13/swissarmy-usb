@@ -164,7 +164,7 @@ resolve_mount() {
         fi
         # Check before mounting anything.
         ((STICK_PLANNED)) || is_ventoy_disk "$arg" \
-            || die "$arg is not a Ventoy stick (no VTOYEFI partition); run: ./setup.sh install $arg"
+            || die "$arg is not a Ventoy stick (no VTOYEFI partition); run: $PROG install $arg"
         device_mount_data "$arg"
         return
     fi

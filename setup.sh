@@ -32,8 +32,8 @@ WITH_QEMU=0
 AUTO_CONFIG=1
 
 usage() {
-    cat <<'EOF'
-Usage: ./setup.sh [--dry-run] <command> [args] [options]
+    cat <<EOF
+Usage: $PROG [--dry-run] <command> [args] [options]
 
 Commands:
   deps [--qemu]                 apt install the required tools (+ QEMU/OVMF)
@@ -82,7 +82,7 @@ cmd_install() {
     need_device "${1:-}"
     ventoy_install "$1"
     is_dry_run && return 0
-    ok "Ventoy installed. Next: ./setup.sh themes $1 && ./setup.sh isos $1"
+    ok "Ventoy installed. Next: $PROG themes $1 && $PROG isos $1"
 }
 
 cmd_update() {
@@ -123,7 +123,7 @@ test_hint() {
     disk=$(lsblk -no PKNAME "$part" 2>/dev/null || true)
     [[ -n $disk ]] || disk="<device>"
     [[ $disk == /dev/* || $disk == "<device>" ]] || disk=/dev/$disk
-    ok "test it: ./setup.sh test $disk   (UEFI: ./setup.sh test $disk --uefi)"
+    ok "test it: $PROG test $disk   (UEFI: $PROG test $disk --uefi)"
 }
 
 cmd_isos() {
@@ -165,7 +165,7 @@ cmd_config() {
 
 cmd_persistence() {
     local name=${1:-} mnt
-    [[ -n $name ]] || die "usage: setup.sh persistence <name> [mount|device] [--size MB]"
+    [[ -n $name ]] || die "usage: $PROG persistence <name> [mount|device] [--size MB]"
     manifest_load
     mnt=$(resolve_mount "${2:-}")
     persistence_create "$mnt" "$name" "$SIZE"
@@ -175,7 +175,7 @@ cmd_persistence() {
 cmd_test() {
     local target=${1:-} ovmf
     local -a qemu
-    [[ -n $target ]] || die "usage: setup.sh test <device|image> [--uefi]"
+    [[ -n $target ]] || die "usage: $PROG test <device|image> [--uefi]"
     need_cmd qemu-system-x86_64
     if [[ -b $target ]]; then
         device_check "$target"
@@ -195,7 +195,7 @@ cmd_test() {
         for ovmf in /usr/share/ovmf/OVMF.fd /usr/share/qemu/OVMF.fd; do
             [[ -f $ovmf ]] && break
         done
-        [[ -f $ovmf ]] || die "OVMF not found (./setup.sh deps --qemu)"
+        [[ -f $ovmf ]] || die "OVMF not found ($PROG deps --qemu)"
         qemu+=(-bios "$ovmf")
     fi
     log "booting $target in QEMU (close the window to stop)"
@@ -223,9 +223,9 @@ cmd_all() {
     cmd_isos "$mnt" || status=$?
     cmd_config "$mnt"
     if ((status)); then
-        warn "some ISOs failed; rerun ./setup.sh isos $dev to retry them"
+        warn "some ISOs failed; rerun $PROG isos $dev to retry them"
     else
-        ok "done. Test it: ./setup.sh test $dev   (UEFI: ./setup.sh test $dev --uefi)"
+        ok "done. Test it: $PROG test $dev   (UEFI: $PROG test $dev --uefi)"
     fi
     return "$status"
 }

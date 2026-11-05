@@ -235,7 +235,7 @@ iso_manual() {
     fi
     if [[ -z $src ]]; then
         warn "[$id] MISSING, manual download: $(m "$id" url)"
-        warn "[$id]   then: ./setup.sh isos --from ~/Downloads $id   (or copy it to $(iso_path "$id"))"
+        warn "[$id]   then: $PROG isos --from ~/Downloads $id   (or copy it to $(iso_path "$id"))"
         echo missing; return
     fi
 
@@ -282,7 +282,7 @@ isos_sync() {
     # behind by an interrupted run keeps holding it until it has stopped.
     if ! is_dry_run; then
         exec 9>"$(state_dir "$mnt")/.lock"
-        flock -n 9 || die "another setup.sh (or its download) is still working on this stick"
+        flock -n 9 || die "another $PROG run (or its download) is still working on this stick"
     fi
 
     for id in "${ids[@]}"; do

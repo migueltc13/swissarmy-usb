@@ -7,7 +7,7 @@ VENTOY_RELEASES=https://github.com/ventoy/Ventoy/releases/download
 ventoy_version() {
     local v
     v=$(kv_get "$VENTOY_ROOT/VERSION" VERSION)
-    [[ -n $v ]] || die "ventoy/VERSION is missing; run: ./setup.sh ventoy-bump <version>"
+    [[ -n $v ]] || die "ventoy/VERSION is missing; run: $PROG ventoy-bump <version>"
     echo "$v"
 }
 
@@ -79,7 +79,7 @@ ventoy_relabel() {
 ventoy_bump() {
     local version=${1:-} tmp tarball expected actual
     version=${version#v}
-    [[ $version =~ ^[0-9]+(\.[0-9]+)+$ ]] || die "usage: setup.sh ventoy-bump <version>  (e.g. 1.1.18)"
+    [[ $version =~ ^[0-9]+(\.[0-9]+)+$ ]] || die "usage: $PROG ventoy-bump <version>  (e.g. 1.1.18)"
     tarball="ventoy-$version-linux.tar.gz"
 
     log "fetching checksums for Ventoy $version"

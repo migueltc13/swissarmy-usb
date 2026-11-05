@@ -42,14 +42,22 @@ sudo apt install shellcheck   # and Node.js for prettier
 ## Before opening a pull request
 
 ```sh
-shellcheck -x setup.sh lib/*.sh                   # must be clean
-npx prettier --check . '!ventoy/**' '!themes/**'  # Markdown, JSON, YAML
-./setup.sh -n isos /tmp/nostick                   # every resolver resolves
+# must be clean
+shellcheck -x setup.sh lib/*.sh share/bash-completion/completions/*
+# Markdown, JSON and YAML formatting
+npx prettier --check . '!ventoy/**' '!themes/**'
+# every resolver still finds a release
+./setup.sh -n isos /tmp/nostick
 ```
 
 The last one is a dry run against a stick path that doesn't exist, so it
 needs no stick and downloads nothing. GitHub Actions runs the same checks on
 every pull request, and the resolver check also runs weekly.
+
+Adding or changing a command or option? Update `--help` in `setup.sh`, the
+man page in `share/man/man1/swissarmy-usb.1` and the bash completion in
+`share/bash-completion/completions/swissarmy-usb`. CI fails when `--help`
+lists something the man page doesn't.
 
 For changes to installing, themes or the boot menu, also boot a loop-device
 image with `./setup.sh test stick.img` (add `--uefi` for UEFI) and check the

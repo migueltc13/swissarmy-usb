@@ -15,8 +15,21 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: shellcheck
-        run: shellcheck -x setup.sh lib/*.sh
+        run: shellcheck -x setup.sh lib/*.sh share/bash-completion/completions/swissarmy-usb
 
       # ventoy/ and themes/ are upstream code, kept exactly as shipped.
       - name: prettier
         run: npx --yes prettier@3.9.9 --check . '!ventoy/**' '!themes/**'
+
+      # Every command and option in --help must be in the man page (roff
+      # writes "-" as "\-", so undo that before searching).
+      - name: man page covers --help
+        shell: bash
+        run: |
+          man=share/man/man1/swissarmy-usb.1
+          text=$(sed 's/\\-/-/g' "$man")
+          missing=0
+          for word in $(./setup.sh --help | sed -nE 's/^  ([a-z][a-z-]*) .*/\1/p; s/^  ([a-z][a-z-]*)$/\1/p; s/^  (-[a-z]), (--[a-z-]+).*/\1 \2/p; s/^  (--[a-z-]+).*/\1/p'); do
+            grep -qF -- "$word" <<<"$text" || { echo "::error::'$word' is in --help but not in $man"; missing=1; }
+          done
+          exit $missing

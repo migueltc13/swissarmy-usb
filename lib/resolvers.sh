@@ -98,8 +98,9 @@ resolve_kali() {
     [[ -n $R_NAME ]] || return 1
     R_VERSION=$(sed -E 's/^kali-linux-([0-9.]+)-.*/\1/' <<<"$R_NAME")
     R_URL="$base/$dir/$R_NAME"
-    # Kali only seeds some images (e.g. live) as torrents.
-    curl -fsIL -o /dev/null "$R_URL" || R_URL="$R_URL.torrent"
+    # Kali only seeds some images (e.g. live) as torrents. Retry, so that a
+    # network hiccup doesn't switch an HTTP image to a torrent that doesn't exist.
+    curl -fsIL --retry 3 --connect-timeout 20 -o /dev/null "$R_URL" || R_URL="$R_URL.torrent"
     R_SIG_URL="$base/$dir/SHA256SUMS.gpg" R_SIG_OF=sums
 }
 
@@ -186,7 +187,10 @@ resolve_krd() {
     local modified
     no_pin krd
     R_URL=https://rescuedisk.s.kaspersky-labs.com/updatable/2018/krd.iso
-    modified=$(curl -fsIL "$R_URL" | tr -d '\r' | sed -n 's/^[Ll]ast-[Mm]odified: //p' | tail -n 1)
+    # Retry on any error: Kaspersky's server now and then refuses requests
+    # (seen from GitHub Actions runners) and answers fine moments later.
+    modified=$(curl -fsIL --retry 3 --retry-all-errors --retry-delay 3 --connect-timeout 20 "$R_URL" \
+        | tr -d '\r' | sed -n 's/^[Ll]ast-[Mm]odified: //p' | tail -n 1)
     [[ -n $modified ]] || return 1
     R_VERSION=$(date -u -d "$modified" +%Y-%m-%d)
 }

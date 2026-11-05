@@ -6,6 +6,8 @@
 # what "up to date" checks and Files/isos.md are based on.
 
 FROM_DIR=${FROM_DIR:-}
+# --replace: copy manual ISOs from FROM_DIR even when one is already on the stick.
+REPLACE=${REPLACE:-0}
 
 state_dir() { echo "$1/Files/.swissarmy"; }
 
@@ -199,13 +201,14 @@ iso_fetch() {
 
 # iso_manual MNT ID: ISOs we can't download (Windows, Redo Rescue). Copies
 # them from --from <dir> when given, otherwise explains where to get them.
+# One already on the stick is kept, unless --replace asks for a fresh copy.
 # Echoes one of: ok skip missing fail.
 iso_manual() {
     local mnt=$1 id=$2 dest state src='' cand sha part
     dest="$mnt$(iso_path "$id")"
     state="$(state_dir "$mnt")/$id.env"
 
-    if [[ -f $dest ]]; then
+    if [[ -f $dest && $REPLACE != 1 ]]; then
         if [[ ! -f $state ]]; then
             log "[$id] found $(m "$id" file), recording its checksum"
             write_state "$state" "VERSION=manual" "NAME=$(m "$id" file)" "URL=$(m "$id" url)" \
@@ -225,6 +228,11 @@ iso_manual() {
                 find "$FROM_DIR" -maxdepth 1 -type f -name "$(m "$id" match)" | sort -V)
         fi
     fi
+    if [[ -z $src && -f $dest ]]; then
+        # --replace without a new file: keep the one on the stick.
+        warn "[$id] nothing matching $(m "$id" match) in $FROM_DIR, keeping $(m "$id" file)"
+        echo fail; return
+    fi
     if [[ -z $src ]]; then
         warn "[$id] MISSING, manual download: $(m "$id" url)"
         warn "[$id]   then: ./setup.sh isos --from ~/Downloads $id   (or copy it to $(iso_path "$id"))"
@@ -232,6 +240,7 @@ iso_manual() {
     fi
 
     log "[$id] copying $src"
+    [[ -f $dest ]] && log "[$id] replacing $(m "$id" file) once the copy is complete"
     if is_dry_run; then
         run cp "$src" "$dest"
         echo ok; return

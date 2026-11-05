@@ -51,6 +51,8 @@ Commands:
 Options:
   -n, --dry-run    print what would be done; change nothing
   --from <dir>     copy manual ISOs (Windows, Redo Rescue) from <dir>
+  --replace        isos: replace manual ISOs already on the stick with the
+                   ones in --from (manual ISOs only; needs their ids)
   --size <MB>      persistence image size (default 4096)
   --uefi           test: boot with OVMF (UEFI) instead of BIOS
   --qemu           deps: also install qemu-system-x86 and ovmf
@@ -124,7 +126,7 @@ test_hint() {
 }
 
 cmd_isos() {
-    local mnt='' status=0 list
+    local mnt='' status=0 list id
     local -a ids=()
     need_cmd curl jq sha256sum
     manifest_load
@@ -135,6 +137,14 @@ cmd_isos() {
     # Expand ids before anything else: a typo must abort, not mean "all".
     list=$(expand_ids "$@") || exit 1
     [[ -n $list ]] && mapfile -t ids <<<"$list"
+    if ((REPLACE)); then
+        # Downloaded ISOs update themselves; --replace is for manual ones.
+        [[ -n $FROM_DIR ]] || die "--replace needs --from <dir> with the new ISO"
+        ((${#ids[@]})) || die "--replace needs the ids to replace (e.g. windows11)"
+        for id in "${ids[@]}"; do
+            is_manual "$id" || die "--replace is only for manual ISOs; '$id' is downloaded and updates itself"
+        done
+    fi
     mnt=$(resolve_mount "$mnt")
     isos_sync "$mnt" "${ids[@]}" || status=$?
     if ((AUTO_CONFIG)); then # not when called from "all", which says it itself
@@ -228,6 +238,7 @@ main() {
             -n | --dry-run) DRY_RUN=1 ;;
             --from) FROM_DIR=${2:?--from needs a directory}; shift ;;
             --from=*) FROM_DIR=${1#*=} ;;
+            --replace) REPLACE=1 ;;
             --size) SIZE=${2:?--size needs a value in MB}; shift ;;
             --size=*) SIZE=${1#*=} ;;
             --uefi) UEFI=1 ;;

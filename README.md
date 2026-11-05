@@ -48,6 +48,18 @@ yourself, then:
 ./setup.sh isos --from ~/Downloads windows redorescue
 ```
 
+A manual ISO already on the stick is kept on later runs. When you download a
+newer one (say Windows 11 26H2), replace it with `--replace`:
+
+```sh
+./setup.sh isos --from ~/Downloads --replace windows11
+```
+
+`--replace` is **only for manual ISOs** (Windows 10/11, Redo Rescue) and needs
+their ids. The newest matching file in `--from` is copied, and the old ISO is
+only replaced once the copy is complete. Downloaded ISOs don't need it: `isos`
+updates them whenever upstream releases a new version.
+
 Then boot it in a VM to check: `./setup.sh test /dev/sdb`.
 
 ## What ends up on the stick
@@ -123,6 +135,7 @@ Examples:
 ./setup.sh isos kali tails                 # "kali" = kali-netinst + kali-live
 ./setup.sh isos /media/$USER/SWISSARMY gparted
 ./setup.sh isos --from ~/Downloads windows # copies Win10_*/Win11_* ISOs
+./setup.sh isos --from ~/Downloads --replace windows11  # newer manual ISO
 ./setup.sh -n isos                         # show what is outdated, download nothing
 ./setup.sh config
 ./setup.sh persistence kali --size 4096

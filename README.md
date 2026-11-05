@@ -68,19 +68,29 @@ Then boot it in a VM to check: `./setup.sh test /dev/sdb`.
 ./setup.sh link
 ```
 
-This adds a `swissarmy-usb` command, its man page and bash completion, as
-symlinks in `~/.local`:
+This adds a `swissarmy-usb` command, its man page and shell completion (bash
+and zsh), as symlinks in `~/.local`:
 
 | Link                                                       | Points to                                         |
 | ---------------------------------------------------------- | ------------------------------------------------- |
 | `~/.local/bin/swissarmy-usb`                               | `setup.sh`                                        |
 | `~/.local/share/man/man1/swissarmy-usb.1`                  | `share/man/man1/swissarmy-usb.1`                  |
 | `~/.local/share/bash-completion/completions/swissarmy-usb` | `share/bash-completion/completions/swissarmy-usb` |
+| `~/.local/share/zsh/site-functions/_swissarmy-usb`         | `share/zsh/site-functions/_swissarmy-usb`         |
 
 Then `swissarmy-usb isos`, `man swissarmy-usb` and tab completion work from
 any directory. Completion offers the commands, options, ISO ids from
-`isos.conf`, and only USB disks where a device is expected. Hints in the
-output use the `swissarmy-usb` name too.
+`isos.conf`, and only USB disks where a device is expected; zsh also shows
+a description next to each. Hints in the output use the `swissarmy-usb`
+name too.
+
+**zsh:** zsh doesn't look in `~/.local/share/zsh/site-functions` by default.
+If your shell is zsh, `link` prints the line to add to `~/.zshrc` (before
+`compinit`, or before `source $ZSH/oh-my-zsh.sh` with oh-my-zsh):
+
+```zsh
+fpath=(~/.local/share/zsh/site-functions $fpath)
+```
 
 The links point into the clone, so a `git pull` updates all three; keep the
 clone where it is. `link` never replaces a file it didn't create, and
@@ -149,7 +159,7 @@ Where a command takes `[mount|device]` you can pass the mountpoint
 | `test <device\|image> [--uefi]`                | Boot the stick in QEMU                                                                                                                   |
 | `all <device>`                                 | Everything above, in order                                                                                                               |
 | `ventoy-bump <version>`                        | Vendor a different Ventoy release                                                                                                        |
-| `link` / `unlink`                              | Add (or remove) the `swissarmy-usb` command, man page and bash completion in `~/.local`                                                  |
+| `link` / `unlink`                              | Add (or remove) the `swissarmy-usb` command, man page and shell completion in `~/.local`                                                 |
 
 Examples:
 

@@ -141,8 +141,16 @@ into
 .IR ~/.local/bin ,
 this man page into
 .I ~/.local/share/man/man1
-and the bash completion into
-.IR ~/.local/share/bash\-completion/completions .
+the bash completion into
+.I ~/.local/share/bash\-completion/completions
+and the zsh completion into
+.IR ~/.local/share/zsh/site\-functions .
+zsh doesn't search that folder by default; for zsh users,
+.B link
+prints the
+.I fpath
+line to add to
+.IR ~/.zshrc .
 Existing files that aren't links to the clone are left alone.
 .TP
 .B unlink

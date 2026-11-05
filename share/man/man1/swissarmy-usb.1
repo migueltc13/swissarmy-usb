@@ -1,0 +1,302 @@
+.TH SWISSARMY\-USB 1 2026-11-05 swissarmy\-usb "User Commands"
+.SH NAME
+swissarmy\-usb \- build a multiboot USB stick with Ventoy
+.SH SYNOPSIS
+.B swissarmy\-usb
+.RB [ \-n ]
+.I command
+.RI [ args ]
+.RI [ options ]
+.PP
+.B ./setup.sh
+.RB [ \-n ]
+.I command
+.RI [ args ]
+.RI [ options ]
+.SH DESCRIPTION
+.B swissarmy\-usb
+sets up a Ventoy multiboot USB stick on Ubuntu: it installs the vendored
+Ventoy release, copies three GRUB themes, downloads and verifies the ISOs
+listed in
+.I isos.conf
+(installers, disk tools, rescue systems, security distros and offline
+antivirus), and generates Ventoy's configuration.
+.PP
+It is
+.I setup.sh
+from the swissarmy\-usb repository, usually linked into
+.I ~/.local/bin
+as
+.B swissarmy\-usb
+by the
+.B link
+command. Hints in its output use the name it was run as.
+.PP
+Where a command takes
+.RI [ mount | device ],
+pass the stick's mountpoint, its device (mounted with
+.BR udisksctl (1)
+if needed), or nothing: a mounted stick labelled
+.B SWISSARMY
+or
+.B Ventoy
+is found automatically.
+.SH COMMANDS
+.TP
+.BR deps " [" \-\-qemu ]
+Install the required tools with
+.BR apt\-get :
+git, curl, jq, gnupg, aria2, pv, exfatprogs, dosfstools, parted, xz\-utils,
+udisks2 and util\-linux.
+.B \-\-qemu
+adds qemu\-system\-x86 and ovmf for the
+.B test
+command.
+.TP
+.BI install " device"
+Install Ventoy with GPT and Secure Boot support on
+.IR device .
+.B This erases the whole device.
+See
+.BR SAFETY .
+.TP
+.BI update " device"
+Update Ventoy on an existing stick to the vendored version.
+ISOs and configuration are kept.
+.TP
+.BR themes " [" \fImount\fR | \fIdevice\fR ]
+Copy the Catppuccin Mocha, Tokyo Night and Vimix GRUB themes to
+.IR ventoy/theme/ ,
+then regenerate the configuration.
+.TP
+.BR isos " [" \fImount\fR | \fIdevice\fR "] [" \fIid\fR ...]
+Download, verify and place the ISOs from
+.IR isos.conf :
+all of them, or only the given ids.
+An id prefix selects every id that starts with it
+.RB ( kali
+is kali\-netinst and kali\-live).
+ISOs already up to date are skipped and interrupted downloads resume.
+Each download is checked against its SHA256 and, where the project signs its
+releases, a GPG signature from a pinned key fingerprint; anything that fails
+is deleted and reported.
+Windows 10/11 and Redo Rescue can't be downloaded and are copied from
+.BR \-\-from .
+Exits non\-zero if any ISO failed.
+.TP
+.BR config " [" \fImount\fR | \fIdevice\fR ]
+Regenerate
+.I ventoy/ventoy.json
+(themes, menu aliases, tips, persistence) and
+.I Files/isos.md
+on the stick.
+.BR themes ,
+.B isos
+and
+.B persistence
+do this by themselves.
+.TP
+.BI persistence " name" " \fR[\fImount\fR|\fIdevice\fR] [" \-\-size " MB\fR]"
+Create the persistence image
+.IR ventoy/persistence/name .dat
+for the ISO
+.I name
+(an id, or a prefix such as
+.BR kali ).
+Only entries with a
+.B persistence
+key in
+.I isos.conf
+support it.
+.TP
+.BR test " \fIdevice\fR|\fIimage\fR [" \-\-uefi ]
+Boot the stick or a disk image in QEMU, with BIOS or, with
+.BR \-\-uefi ,
+OVMF.
+.TP
+.BI all " device"
+Everything in order:
+.BR deps ,
+.BR install ,
+label the data partition
+.BR SWISSARMY ,
+.BR themes ,
+.B isos
+and
+.BR config .
+.TP
+.BI ventoy\-bump " version"
+Download a Ventoy Linux release, check it against the release's
+.IR sha256.txt ,
+and vendor it in
+.I ventoy/
+of the clone.
+.TP
+.B link
+Make
+.B swissarmy\-usb
+a command: symlink
+.I setup.sh
+into
+.IR ~/.local/bin ,
+this man page into
+.I ~/.local/share/man/man1
+the bash completion into
+.I ~/.local/share/bash\-completion/completions
+and the zsh completion into
+.IR ~/.local/share/zsh/site\-functions .
+zsh doesn't search that folder by default; for zsh users,
+.B link
+prints the
+.I fpath
+line to add to
+.IR ~/.zshrc .
+Existing files that aren't links to the clone are left alone.
+.TP
+.B unlink
+Remove the symlinks created by
+.BR link .
+.TP
+.B help
+Show the usage summary.
+.SH OPTIONS
+.TP
+.BR \-n ", " \-\-dry\-run
+Print what would be done and change nothing.
+Resolving versions and checking signatures still runs, since it only reads.
+.TP
+.BI \-\-from " dir"
+Copy the manual ISOs (Windows 10/11, Redo Rescue) from
+.IR dir .
+The newest file matching the entry's
+.B match
+pattern is used.
+.TP
+.B \-\-replace
+With
+.BR isos :
+replace manual ISOs already on the stick with the newest matching file in
+.BR \-\-from .
+Only for manual ISOs, and only for the ids given.
+The old ISO is replaced once the copy is complete.
+.TP
+.BI \-\-size " MB"
+Size of the persistence image (default 4096, at least 64).
+.TP
+.B \-\-uefi
+With
+.BR test :
+boot with OVMF (UEFI) instead of BIOS.
+.TP
+.B \-\-qemu
+With
+.BR deps :
+also install qemu\-system\-x86 and ovmf.
+.TP
+.BR \-h ", " \-\-help
+Show the usage summary.
+.SH SAFETY
+.B install
+and
+.B all
+erase the target, so they only accept whole disks that are removable or on
+USB, refuse a disk with a system mount
+.RI ( / ,
+.IR /boot ,
+.IR /home ,
+swap, ...) or a filesystem mounted outside
+.IR /media ,
+.I /run/media
+or
+.IR /mnt ,
+refuse the disk holding
+.IR / ,
+show the disk with
+.BR lsblk (8)
+and require its name to be typed.
+There is no option to skip that confirmation.
+.PP
+The other commands only write to a Ventoy stick: the target's disk must have
+Ventoy's
+.B VTOYEFI
+partition.
+.B isos
+locks the stick, so two runs can't download onto it at once.
+.SH ENVIRONMENT
+.TP
+.B SWISSARMY_ALLOW_LOOP
+Set to 1 to accept loop devices, for testing with
+.BR losetup (8).
+.TP
+.B XDG_CACHE_HOME
+Torrent downloads (Kali Live) go to
+.I $XDG_CACHE_HOME/swissarmy\-usb
+(default
+.IR ~/.cache/swissarmy\-usb )
+when the PC has room, and are then copied to the stick.
+.SH FILES
+In the clone:
+.TP
+.I isos.conf
+The ISO manifest: folders, ISOs, download sources, verification, pins.
+.TP
+.I config/ventoy.tmpl.json
+Template for
+.IR ventoy.json :
+theme settings, resolution, menu options.
+.TP
+.I ventoy/VERSION
+The vendored Ventoy version, its checksum and where its source is.
+.PP
+On the stick:
+.TP
+.I ventoy/ventoy.json
+The generated Ventoy configuration.
+.TP
+.I Files/isos.md
+The list of ISOs: version, language, date, source and SHA256.
+.TP
+.I Files/.swissarmy/
+Download state and partial downloads.
+.SH EXIT STATUS
+0 on success; non\-zero when a command fails, including when any ISO fails to
+download or verify.
+.SH EXAMPLES
+Preview, then build a stick on
+.IR /dev/sdb :
+.PP
+.nf
+.RS
+swissarmy\-usb \-\-dry\-run all /dev/sdb
+swissarmy\-usb all /dev/sdb
+.RE
+.fi
+.PP
+Update the ISOs, and add the manual ones from the Downloads folder:
+.PP
+.nf
+.RS
+swissarmy\-usb isos
+swissarmy\-usb isos \-\-from ~/Downloads windows redorescue
+.RE
+.fi
+.PP
+Show what is outdated without downloading anything:
+.PP
+.nf
+.RS
+swissarmy\-usb \-n isos
+.RE
+.fi
+.SH SEE ALSO
+.BR lsblk (8),
+.BR udisksctl (1),
+.BR qemu\-system\-x86_64 (1)
+.PP
+README:
+.UR https://github.com/migueltc13/swissarmy\-usb
+.UE
+.br
+Ventoy:
+.UR https://www.ventoy.net
+.UE

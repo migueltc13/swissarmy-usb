@@ -24,6 +24,10 @@ source "$REPO_DIR/lib/isos.sh"
 source "$REPO_DIR/lib/config.sh"
 # shellcheck source=lib/persistence.sh
 source "$REPO_DIR/lib/persistence.sh"
+# shellcheck source=lib/link.sh
+source "$REPO_DIR/lib/link.sh"
+# shellcheck source=lib/cli.sh
+source "$REPO_DIR/lib/cli.sh"
 
 STICK_LABEL=SWISSARMY
 SIZE=4096
@@ -32,32 +36,14 @@ WITH_QEMU=0
 AUTO_CONFIG=1
 
 usage() {
-    cat <<EOF
-Usage: $PROG [--dry-run] <command> [args] [options]
-
-Commands:
-  deps [--qemu]                 apt install the required tools (+ QEMU/OVMF)
-  install <device>              install Ventoy (GPT + Secure Boot), WIPES the device
-  update  <device>              update Ventoy on an existing stick (keeps files)
-  themes  [mount|device]        copy the GRUB themes to ventoy/theme/
-  isos    [mount|device] [id…]  download/verify ISOs (all, or the given ids)
-  config  [mount|device]        regenerate ventoy/ventoy.json and Files/isos.md
-  persistence <name> [mount|device] [--size MB]
-                                create ventoy/persistence/<name>.dat
-  test    <device|image> [--uefi]
-                                boot the stick in QEMU
-  all     <device>              deps, install, relabel, themes, isos, config
-  ventoy-bump <version>         vendor another Ventoy release
-
-Options:
-  -n, --dry-run    print what would be done; change nothing
-  --from <dir>     copy manual ISOs (Windows, Redo Rescue) from <dir>
-  --replace        isos: replace manual ISOs already on the stick with the
-                   ones in --from (manual ISOs only; needs their ids)
-  --size <MB>      persistence image size (default 4096)
-  --uefi           test: boot with OVMF (UEFI) instead of BIOS
-  --qemu           deps: also install qemu-system-x86 and ovmf
-  -h, --help       show this help
+    echo "Usage: $PROG [--dry-run] <command> [args] [options]"
+    echo
+    echo "Commands:"
+    cli_help_commands
+    echo
+    echo "Options:"
+    cli_help_options
+    cat <<'EOF'
 
 The mount/device argument is optional: a mounted stick labelled SWISSARMY or
 Ventoy is found automatically. An id prefix like "kali" selects every entry
@@ -234,6 +220,13 @@ cmd_all() {
 
 main() {
     local -a args=()
+    # Shell completion asks us what can come next (see lib/cli.sh). Handled
+    # before parsing, since the words typed so far may include options.
+    if [[ ${1:-} == __complete ]]; then
+        shift
+        cli_complete "$@"
+        exit 0
+    fi
     while (($#)); do
         case $1 in
             -n | --dry-run) DRY_RUN=1 ;;
@@ -271,6 +264,8 @@ main() {
         test) cmd_test "${args[@]}" ;;
         all) cmd_all "${args[@]}" ;;
         ventoy-bump) ventoy_bump "${args[@]}" ;;
+        link) link_install ;;
+        unlink) link_remove ;;
         help) usage ;;
         *) die "unknown command '$cmd' (see --help)" ;;
     esac

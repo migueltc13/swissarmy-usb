@@ -1,0 +1,25 @@
+# shellcheck shell=bash
+# Bash completion for swissarmy-usb. The command completes itself: this only
+# passes the words typed so far to "swissarmy-usb __complete" (lib/cli.sh)
+# and keeps the answers that match the word being completed.
+
+_swissarmy_usb() {
+    local cur=${COMP_WORDS[COMP_CWORD]} line
+    COMPREPLY=()
+    while IFS= read -r line; do
+        case $line in
+            :dirs)
+                compopt -o filenames
+                mapfile -t -O "${#COMPREPLY[@]}" COMPREPLY < <(compgen -d -- "$cur") ;;
+            :img)
+                compopt -o filenames
+                mapfile -t -O "${#COMPREPLY[@]}" COMPREPLY < <(
+                    compgen -f -X '!*.img' -- "$cur"
+                    compgen -d -- "$cur") ;;
+            "$cur"*)
+                COMPREPLY+=("$line") ;;
+        esac
+    done < <("$1" __complete bash "${COMP_WORDS[@]:1:COMP_CWORD}" 2>/dev/null)
+}
+
+complete -F _swissarmy_usb swissarmy-usb

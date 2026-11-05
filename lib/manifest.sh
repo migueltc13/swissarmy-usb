@@ -17,7 +17,7 @@ manifest_load() {
     M=() ISO_IDS=() FOLDER_IDS=()
     while IFS= read -r line || [[ -n $line ]]; do
         n=$((n + 1))
-        line=$(trim "$line")
+        trim line "$line"
         [[ -z $line || $line == \#* ]] && continue
         if [[ $line =~ ^\[([^]]+)\]$ ]]; then
             section=${BASH_REMATCH[1]}
@@ -33,8 +33,8 @@ manifest_load() {
         fi
         [[ $line == *=* ]] || die "isos.conf:$n: expected 'key = value'"
         [[ -n $section ]] || die "isos.conf:$n: value outside of a [section]"
-        key=$(trim "${line%%=*}")
-        value=$(trim "${line#*=}")
+        trim key "${line%%=*}"
+        trim value "${line#*=}"
         M[$section.$key]=$value
     done <"$MANIFEST"
     manifest_validate

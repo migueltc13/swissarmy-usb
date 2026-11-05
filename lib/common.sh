@@ -79,12 +79,14 @@ kv_get() {
     sed -n "s/^${key}=//p" "$file" | tail -n 1
 }
 
-# trim STRING: strip leading and trailing whitespace.
+# trim VAR STRING: set VAR to STRING without leading and trailing whitespace.
+# It assigns instead of printing, so callers need no $(...) subshell: that
+# made reading isos.conf take 0.35 s, which shell completion would feel.
 trim() {
-    local s=$1
+    local s=$2
     s=${s#"${s%%[![:space:]]*}"}
     s=${s%"${s##*[![:space:]]}"}
-    printf '%s' "$s"
+    printf -v "$1" '%s' "$s"
 }
 
 # copy_hash SRC DEST: copy a (large) file and print its SHA256, reading SRC

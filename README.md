@@ -64,18 +64,29 @@ Then boot it in a VM to check: `./setup.sh test /dev/sdb`.
 
 ### Run it from anywhere
 
-Link `setup.sh` into a folder on your `PATH` (run this inside the repo):
-
 ```sh
-mkdir -p ~/.local/bin
-ln -s "$PWD/setup.sh" ~/.local/bin/swissarmy-usb
+./setup.sh link
 ```
 
-Then `swissarmy-usb isos`, `swissarmy-usb test /dev/sdb` and so on work from
-any directory, and its hints use that name too. The link finds `lib/`,
-`isos.conf` and the rest next to the real `setup.sh`, so keep the clone where
-it is. On Ubuntu, `~/.local/bin` is added to `PATH` at login once it exists,
-so log out and back in if `swissarmy-usb` isn't found yet.
+This adds a `swissarmy-usb` command, its man page and bash completion, as
+symlinks in `~/.local`:
+
+| Link                                                       | Points to                                         |
+| ---------------------------------------------------------- | ------------------------------------------------- |
+| `~/.local/bin/swissarmy-usb`                               | `setup.sh`                                        |
+| `~/.local/share/man/man1/swissarmy-usb.1`                  | `share/man/man1/swissarmy-usb.1`                  |
+| `~/.local/share/bash-completion/completions/swissarmy-usb` | `share/bash-completion/completions/swissarmy-usb` |
+
+Then `swissarmy-usb isos`, `man swissarmy-usb` and tab completion work from
+any directory. Completion offers the commands, options, ISO ids from
+`isos.conf`, and only USB disks where a device is expected. Hints in the
+output use the `swissarmy-usb` name too.
+
+The links point into the clone, so a `git pull` updates all three; keep the
+clone where it is. `link` never replaces a file it didn't create, and
+`./setup.sh unlink` removes the links again. On Ubuntu, `~/.local/bin` is
+added to `PATH` at login once it exists, so log out and back in if
+`swissarmy-usb` isn't found yet.
 
 ## What ends up on the stick
 
@@ -138,6 +149,7 @@ Where a command takes `[mount|device]` you can pass the mountpoint
 | `test <device\|image> [--uefi]`                | Boot the stick in QEMU                                                                                                                   |
 | `all <device>`                                 | Everything above, in order                                                                                                               |
 | `ventoy-bump <version>`                        | Vendor a different Ventoy release                                                                                                        |
+| `link` / `unlink`                              | Add (or remove) the `swissarmy-usb` command, man page and bash completion in `~/.local`                                                  |
 
 Examples:
 

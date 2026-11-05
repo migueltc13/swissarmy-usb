@@ -24,6 +24,8 @@ source "$REPO_DIR/lib/isos.sh"
 source "$REPO_DIR/lib/config.sh"
 # shellcheck source=lib/persistence.sh
 source "$REPO_DIR/lib/persistence.sh"
+# shellcheck source=lib/link.sh
+source "$REPO_DIR/lib/link.sh"
 
 STICK_LABEL=SWISSARMY
 SIZE=4096
@@ -48,6 +50,9 @@ Commands:
                                 boot the stick in QEMU
   all     <device>              deps, install, relabel, themes, isos, config
   ventoy-bump <version>         vendor another Ventoy release
+  link                          add the swissarmy-usb command, man page and
+                                bash completion (symlinks in ~/.local)
+  unlink                        remove those symlinks again
 
 Options:
   -n, --dry-run    print what would be done; change nothing
@@ -271,6 +276,8 @@ main() {
         test) cmd_test "${args[@]}" ;;
         all) cmd_all "${args[@]}" ;;
         ventoy-bump) ventoy_bump "${args[@]}" ;;
+        link) link_install ;;
+        unlink) link_remove ;;
         help) usage ;;
         *) die "unknown command '$cmd' (see --help)" ;;
     esac

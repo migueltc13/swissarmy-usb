@@ -1,0 +1,16 @@
+#compdef swissarmy-usb
+# zsh completion for swissarmy-usb. The command completes itself: this only
+# passes the words typed so far to "swissarmy-usb __complete" (lib/cli.sh),
+# which answers with "value:description" lines.
+
+local -a candidates
+local line
+for line in ${(f)"$(${words[1]} __complete zsh "${(@)words[2,CURRENT]}" 2>/dev/null)"}; do
+  case $line in
+    :dirs) _files -/ ;;
+    :img) _files -g '*.img(-.)' ;;
+    *) candidates+=("$line") ;;
+  esac
+done
+(( $#candidates )) && _describe -t values 'swissarmy-usb' candidates
+return 0

@@ -9,6 +9,9 @@ FROM_DIR=${FROM_DIR:-}
 
 state_dir() { echo "$1/Files/.swissarmy"; }
 
+# Torrents are downloaded here first, see download().
+cache_dir() { echo "${XDG_CACHE_HOME:-$HOME/.cache}/swissarmy-usb"; }
+
 # gpg_verify KEY_URL FPR SIG FILE: check that SIG is a good signature over
 # FILE made by the key with fingerprint FPR, using a throwaway keyring.
 gpg_verify() {
@@ -51,7 +54,7 @@ download() {
         # Torrents write pieces in random order, which is painfully slow on a
         # USB stick. Download to the PC when it has room (plus 1 GB to spare),
         # then copy to the stick in one sequential pass.
-        cache="${XDG_CACHE_HOME:-$HOME/.cache}/swissarmy-usb"
+        cache=$(cache_dir)
         mkdir -p "$cache"
         avail=$(df --output=avail -B1 "$cache" | tail -n 1)
         if [[ -d $cache/$(basename "$out").d ]] \
@@ -146,9 +149,10 @@ iso_fetch() {
 
     mkdir -p "$(dirname "$dest")" "$(state_dir "$mnt")/partial"
     part="$(state_dir "$mnt")/partial/$id-$R_VERSION.part"
-    # Partial downloads of other versions can't be resumed; drop them.
-    find "$(state_dir "$mnt")/partial" -maxdepth 1 -name "$id-*" \
-        ! -name "$(basename "$part")*" -exec rm -rf {} +
+    # Partial downloads of other versions can't be resumed; drop them, on the
+    # stick and in the PC's torrent cache (those can be several GB each).
+    find "$(state_dir "$mnt")/partial" "$(cache_dir)" -maxdepth 1 -name "$id-*" \
+        ! -name "$(basename "$part")*" -exec rm -rf {} + 2>/dev/null || true
     log "[$id] downloading $R_URL"
     download "$R_URL" "$part" || got_dl=0
     if [[ $got_dl == 1 && -f $part.sha256 ]]; then

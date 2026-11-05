@@ -1,0 +1,46 @@
+# Weekly check that every ISO in isos.conf still resolves upstream: latest
+# version, checksum and GPG signature of the checksum file. It is a dry run
+# against a stick path that doesn't exist, so nothing is downloaded.
+name: Resolvers
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays, 06:00 UTC
+  workflow_dispatch:
+  pull_request:
+    paths: [isos.conf, lib/resolvers.sh, lib/isos.sh]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve every ISO (dry run)
+        shell: bash
+        run: ./setup.sh -n isos "$RUNNER_TEMP/stick" 2>&1 | tee resolvers.log
+
+      # Upstream download pages change; tell the maintainer instead of
+      # waiting for a user to hit it. One open issue at a time.
+      - name: Open an issue on failure
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Weekly resolver check failed"
+          open=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq length)
+          if [ "$open" = 0 ]; then
+            {
+              echo "The weekly dry run of \`./setup.sh -n isos\` failed: $RUN_URL"
+              echo
+              echo '```'
+              grep -E 'FAILED|warning|error' resolvers.log || tail -n 20 resolvers.log
+              echo '```'
+            } > body.md
+            gh issue create --title "$title" --body-file body.md
+          fi

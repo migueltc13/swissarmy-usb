@@ -44,8 +44,12 @@ sudo apt install shellcheck   # and Node.js for prettier
 ```sh
 shellcheck -x setup.sh lib/*.sh   # must be clean
 npx prettier --check .            # Markdown, JSON and YAML formatting
-./setup.sh -n isos                # every resolver still finds a release
+./setup.sh -n isos /tmp/nostick   # every resolver still finds a release
 ```
+
+The last one is a dry run against a stick path that doesn't exist, so it
+needs no stick and downloads nothing. GitHub Actions runs the same checks on
+every pull request, and the resolver check also runs weekly.
 
 For changes to installing, themes or the boot menu, also boot a loop-device
 image with `./setup.sh test stick.img` (add `--uefi` for UEFI) and check the

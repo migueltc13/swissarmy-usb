@@ -111,6 +111,7 @@ SWISSARMY/                        exFAT data partition
 ├── 1-Installers/
 │   ├── archlinux.iso
 │   ├── omarchy.iso
+│   ├── ubuntu-26.04-desktop.iso
 │   ├── ubuntu-24.04-desktop.iso
 │   ├── kali-netinst.iso
 │   ├── windows10.iso             manual download
@@ -280,9 +281,10 @@ For something that can't be downloaded by a script, use `source = manual` with
 
 `pin` is optional. Without it, an entry tracks the latest release.
 
-- **Ubuntu is pinned to `24.04`**: the resolver picks the newest 24.04.x point
-  release (24.04.5.1 today), never 24.10 or 26.04. The `ubuntu` source
-  requires a pin.
+- **Ubuntu ships two LTS series, each pinned**: `[ubuntu-2604]` to `26.04`
+  and `[ubuntu]` to `24.04`. The resolver picks the newest point release of
+  the pinned series (26.04.1 and 24.04.5.1 today), never an interim release
+  like 25.10 or 26.10. The `ubuntu` source requires a pin.
 - `arch` (e.g. `2026.11.01`), `kali` (`2026.3`), `omarchy`, `systemrescue`
   and `caine` accept an exact version.
 - `tails`, `clonezilla`, `gparted`, `sourceforge` and `krd` only serve their
@@ -354,8 +356,8 @@ containing `/ union`) and adds a `persistence` entry for
 whether to use the image. Pick it, then choose Kali's _Live USB Persistence_
 boot entry.
 
-Ubuntu also works (`./setup.sh persistence ubuntu --size 4096`, label
-`casper-rw`). An entry supports persistence when it has a `persistence = <label>`
+Ubuntu also works (label `casper-rw`): `./setup.sh persistence ubuntu-2604
+--size 4096` for 26.04, `./setup.sh persistence ubuntu --size 4096` for 24.04. An entry supports persistence when it has a `persistence = <label>`
 line in `isos.conf`.
 
 > [!NOTE]

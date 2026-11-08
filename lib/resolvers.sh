@@ -57,14 +57,19 @@ resolve_arch() {
     R_SIG_URL="$R_URL.sig" R_SIG_OF=iso
 }
 
+# Since 4.5 the images carry an architecture suffix (omarchy-4.5.0-x86.iso);
+# older pinned versions fall back to the unsuffixed name.
 resolve_omarchy() {
+    local base=https://iso.omarchy.org
     if [[ -n $PIN ]]; then
         R_VERSION=$PIN
     else
-        R_VERSION=$(fetch https://omarchy.org | grep -oE 'iso\.omarchy\.org/omarchy-[0-9.]+\.iso' \
-            | sed -E 's/.*omarchy-([0-9.]+)\.iso/\1/' | sort -V | tail -n 1)
+        R_VERSION=$(fetch https://omarchy.org | grep -oE 'iso\.omarchy\.org/omarchy-[0-9.]+(-x86)?\.iso' \
+            | sed -E 's/.*omarchy-([0-9.]+)(-x86)?\.iso/\1/' | sort -V | tail -n 1)
     fi
-    R_URL="https://iso.omarchy.org/omarchy-$R_VERSION.iso"
+    [[ -n $R_VERSION ]] || return 1
+    R_URL="$base/omarchy-$R_VERSION-x86.iso"
+    curl -fsIL --retry 3 --connect-timeout 20 -o /dev/null "$R_URL" || R_URL="$base/omarchy-$R_VERSION.iso"
     R_SUMS_URL="$R_URL.sha256"
 }
 

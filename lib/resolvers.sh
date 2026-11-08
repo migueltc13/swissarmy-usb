@@ -71,6 +71,7 @@ resolve_omarchy() {
     R_URL="$base/omarchy-$R_VERSION-x86.iso"
     curl -fsIL --retry 3 --connect-timeout 20 -o /dev/null "$R_URL" || R_URL="$base/omarchy-$R_VERSION.iso"
     R_SUMS_URL="$R_URL.sha256"
+    R_SIG_URL="$R_URL.sig" R_SIG_OF=iso
 }
 
 # resolve_ubuntu FLAVOR: newest point release of the pinned series (pin is

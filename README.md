@@ -223,8 +223,8 @@ For every ISO, `isos`:
 3. downloads it, resuming partial downloads (`curl -C -`; Kali Live is only
    seeded as a torrent, so that one uses `aria2c`);
 4. checks the SHA256, plus the GPG signature where upstream signs its releases
-   (Arch, Ubuntu, Kali, Tails, Clonezilla, SystemRescue). Signatures are checked
-   against a pinned key fingerprint in a throwaway keyring;
+   (Arch, Omarchy, Ubuntu, Kali, Tails, Clonezilla, SystemRescue). Signatures
+   are checked against a pinned key fingerprint in a throwaway keyring;
 5. deletes and reports anything that fails, keeping the previous ISO in place.
 
 Kaspersky Rescue Disk publishes no checksum, so it is downloaded over HTTPS

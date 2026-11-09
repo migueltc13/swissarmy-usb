@@ -89,9 +89,9 @@ download() {
         rm -rf "$dir"
     elif [[ -s $out ]]; then
         # Resuming: the SHA256 is computed from the whole file afterwards.
-        curl -fL --progress-bar --retry 3 --connect-timeout 20 -C - -o "$out" "$url"
+        nowrap curl -fL --progress-bar --retry 3 --connect-timeout 20 -C - -o "$out" "$url"
     else
-        hash=$(curl -fL --progress-bar --retry 3 --connect-timeout 20 "$url" \
+        hash=$(nowrap curl -fL --progress-bar --retry 3 --connect-timeout 20 "$url" \
             | tee "$out" | sha256sum) || return 1
         echo "${hash%% *}" >"$out.sha256"
     fi

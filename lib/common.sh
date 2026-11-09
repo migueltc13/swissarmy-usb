@@ -67,10 +67,23 @@ confirm() {
 # One scratch directory per run, removed on exit. Created up front (not lazily)
 # so that make_tmp also works inside $(...) subshells.
 TMP_ROOT=$(mktemp -d -t swissarmy.XXXXXX)
+# Also turn line wrapping back on, in case nowrap was interrupted (Ctrl-C).
 # shellcheck disable=SC2064  # expand now: the path is fixed
-trap "rm -rf '$TMP_ROOT' 2>/dev/null" EXIT
+trap "rm -rf '$TMP_ROOT' 2>/dev/null; if [[ -t 2 ]]; then printf '\033[?7h' >&2; fi" EXIT
 
 make_tmp() { mktemp -d -p "$TMP_ROOT"; }
+
+# nowrap CMD...: run CMD with the terminal's line wrapping off. curl sizes its
+# progress bar once, at start, so after the window shrinks every redraw would
+# wrap onto a new line. Unwrapped, the bar is cut at the right edge instead.
+nowrap() {
+    [[ -t 2 ]] || { "$@"; return; }
+    local rc=0
+    printf '\033[?7l' >&2
+    "$@" || rc=$?
+    printf '\033[?7h' >&2
+    return "$rc"
+}
 
 # Read KEY from a simple KEY=VALUE file.
 kv_get() {

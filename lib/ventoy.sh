@@ -93,7 +93,7 @@ ventoy_bump() {
     fi
 
     tmp=$(make_tmp)
-    curl -fL --progress-bar --retry 3 -o "$tmp/$tarball" "$VENTOY_RELEASES/v$version/$tarball"
+    nowrap curl -fL --progress-bar --retry 3 -o "$tmp/$tarball" "$VENTOY_RELEASES/v$version/$tarball"
     actual=$(sha256sum "$tmp/$tarball" | cut -d' ' -f1)
     [[ $actual == "$expected" ]] || die "checksum mismatch for $tarball (got $actual, want $expected)"
     ok "SHA256 verified: $actual"
